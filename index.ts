@@ -1,18 +1,13 @@
-import { writeLogFiles } from "./util";
-import { retailFloor } from "./features/retail-floor";
 import dotenv from 'dotenv'
-import { projectConfig } from "./projectConfig";
+import { retailFloor } from "./features/retail-floor";
 dotenv.config();
 
-const main = () => {
-
-
+const main = async () => {
     // retail floor
-    retailFloor.execute();
+    await retailFloor.execute();
+    
 
-    // const downRawSql = pg.table('users').whereIn('Id', IDS).del().toQuery() + ';';
-    // UTILITY: ensure the output directory exists
-    writeLogFiles()
+    
 }
 
 main();

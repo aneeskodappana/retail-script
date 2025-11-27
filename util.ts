@@ -1,6 +1,8 @@
 import date from 'human-date';
 import { writeFileSync, mkdirSync } from 'fs';
 import { queryLogBuilder } from './query-log-builder';
+import { createReadStream } from "fs";
+import csv from 'csv-parser';
 
 const sanitizeFilename = (name: string) =>
     name
@@ -8,7 +10,7 @@ const sanitizeFilename = (name: string) =>
         .replace(/\s+/g, ' ') // collapse multiple spaces
         .trim();
         
-export const writeLogFiles = () => {
+export const writeLogFilesAndFlush = (type: 'down' | 'up') => {
 
     const prettyDate = date.prettyPrint(new Date(), { showTime: true });
     const safePrettyDate = sanitizeFilename(prettyDate);
@@ -16,13 +18,20 @@ export const writeLogFiles = () => {
 
     // UTILITY: ensure the output directory exists
     mkdirSync('sql', { recursive: true });
-    const upFileName = `sql/${Date.now()}-[${safePrettyDate}]-up.sql`;
-    const downFileName = `sql/${Date.now()}-[${safePrettyDate}]-down.sql`;
-    const upQueries = queryLogBuilder.getQuery();
-    // const transactionalDownSql = `BEGIN;\n${downRawSql}\nCOMMIT;`;
-    writeFileSync(upFileName, upQueries);
+    const upFileName = `sql/${Date.now()}-[${safePrettyDate}]-${type}.sql`;
+    const queries = queryLogBuilder.getQuery();
+    writeFileSync(upFileName, queries);
+    console.log(`Wrote migration to ${upFileName}`);
     queryLogBuilder.clear();
-    console.log(`Wrote UP migration to ${upFileName}`);
-    // writeFileSync(downFileName, transactionalDownSql);
-    console.log(`Wrote DOWN migration to ${downFileName}`);
+}
+
+export const getCSVContents = async <T>(filePath: string): Promise<Array<T>> => {
+    return new Promise((resolve, reject) => {
+        const results: Array<T> = [];
+        createReadStream(filePath)
+            .pipe(csv())
+            .on('data', (data) => results.push(data))
+            .on('end', () => resolve(results))
+            .on('error', (error) => reject(error));
+    });
 }

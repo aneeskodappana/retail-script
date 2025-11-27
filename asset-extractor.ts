@@ -6,6 +6,6 @@ type AssetExtrator = {
 
 export const assetExtractor: AssetExtrator = {
     grove: {
-        retailFloorPlan: 'floorplan'
+        retailFloorPlan: 'retail-floorplan'
     }
 }

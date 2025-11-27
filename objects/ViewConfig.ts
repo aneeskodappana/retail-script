@@ -75,6 +75,7 @@ export function BuildViewConfig(data: Array<TViewConfig>) {
     queryLogBuilder.add(upRawSql);
     return viewConfigs;
 }
+
 /*
 ```sql
 INSERT INTO public."ViewConfigs" ("Id", "Kind", "Code", "Title", "Subtitle", "NationId", "CityId", "ProjectId", "ClusterId", "AmenityId", "UnitId", "UnitVariantExteriorId", "UnitVariantFloorId", "UnitVariantInteriorId", "HasGallery", "CdnBaseUrl", "ParkingFloorplanId", "ParkingUpgradeGalleryId", "ParkingUpgradeId") VALUES('00e7f1f9-38c8-4106-8be8-ff41640de568'::uuid, 6, 'haven_V_P_6B_A', '6 Bed Premium Villa TypeA', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, '', NULL, NULL, NULL);
