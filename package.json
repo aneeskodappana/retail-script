@@ -1,0 +1,26 @@
+{
+  "name": "retail-script",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/human-date": "^1.4.5",
+    "@types/node": "^24.10.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.4.6",
+    "csv-parser": "^3.2.0",
+    "dotenv": "^17.2.0",
+    "human-date": "^1.4.0",
+    "knex": "^2.4.0",
+    "uuid": "^11.1.0"
+  }
+}

@@ -1,0 +1,1 @@
+insert into "users" ("Id") values ('78e51aaa-e31d-468a-ae2a-a7cfa2b6376f'), ('a4dd4d1d-55e1-43b5-97aa-339a51414946')
