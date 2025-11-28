@@ -6,7 +6,7 @@ export type TLayout3D = {
   Id: string;              // required
   ModelUrl: string;        // required
   ViewConfigId: string;    // required
-  ModelScaleJson: string;  // required
+  ModelScaleJson?: string;  // required
 
   DefaultHotspotGroupIndex?: number; // optional → default: 0
 };
@@ -16,7 +16,7 @@ export function Layout3D(v: TLayout3D, index: number): TLayout3D {
     Id: v.Id,
     ModelUrl: v.ModelUrl,
     ViewConfigId: v.ViewConfigId,
-    ModelScaleJson: v.ModelScaleJson,
+    ModelScaleJson: v.ModelScaleJson || '',
 
     DefaultHotspotGroupIndex: v.DefaultHotspotGroupIndex ?? 0,
   };

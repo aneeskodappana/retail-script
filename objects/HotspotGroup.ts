@@ -9,9 +9,9 @@ export type THotspotGroup = {
     Name: string; // 'grove-retail-mall-2'
     HotspotGroupIndex: number; // 0
     DefaultHotspotIndex: number; // 0
+    Layout3DId: string; // parent ref — 'd2d57db6-7ad4-47da-820c-a771617c0619'
     IsVisible?: boolean; // true
     IsExplorable?: boolean; // true
-    Layout3DId: string; // parent ref — 'd2d57db6-7ad4-47da-820c-a771617c0619'
 };
 
 // Factory that enforces required ordering and (if later needed) would apply defaults.
