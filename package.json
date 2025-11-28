@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "better-sqlite3": "^12.4.6",
+    "csv-parse": "^5.6.0",
     "csv-parser": "^3.2.0",
     "dotenv": "^17.2.0",
     "human-date": "^1.4.0",

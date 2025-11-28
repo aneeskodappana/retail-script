@@ -4,7 +4,7 @@ import { mallInterior } from './features/mall-interior';
 dotenv.config();
 
 const main = async () => {
-    await mallFloor.execute();
+    // await mallFloor.execute();
     await mallInterior.execute();
 }
 
