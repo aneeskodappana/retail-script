@@ -113,6 +113,6 @@ logs the SQL with queryLogBuilder, and returns the mapped array.
 export function BuildHotspots(data: Array<THotspot>) {
     const hotspots = data.map(Hotspot);
     const upRawSql = pg.table(tableNames.Hotspots).insert(hotspots).toQuery() + ';';
-    queryLogBuilder.add(upRawSql);
+    queryLogBuilder.addUp(upRawSql);
     return hotspots;
 }

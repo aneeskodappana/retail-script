@@ -72,7 +72,7 @@ export function ViewConfig(v: TViewConfig, index: number): TViewConfig {
 export function BuildViewConfig(data: Array<TViewConfig>) {
     const viewConfigs = data.map(ViewConfig);
     const upRawSql = pg.table(tableNames.ViewConfigs).insert(viewConfigs).toQuery() + ';';
-    queryLogBuilder.add(upRawSql);
+    queryLogBuilder.addUp(upRawSql);
     return viewConfigs;
 }
 

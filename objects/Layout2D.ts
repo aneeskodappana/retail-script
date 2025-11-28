@@ -87,7 +87,7 @@ export function Layout2D(v: TLayout2D, index: number): TLayout2D {
 export function BuildLayout2D(data: Array<TLayout2D>) {
     const layout2d = data.map(Layout2D);
     const upRawSql = pg.table(tableNames.Layout2Ds).insert(layout2d).toQuery() + ';';
-    queryLogBuilder.add(upRawSql);
+    queryLogBuilder.addUp(upRawSql);
     return layout2d;
 }
 

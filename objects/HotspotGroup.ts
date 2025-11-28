@@ -32,7 +32,7 @@ export function HotspotGroup(v: THotspotGroup, index: number): THotspotGroup {
 export function BuildHotspotGroups(data: Array<THotspotGroup>) {
     const hotspotGroups = data.map(HotspotGroup);
     const upRawSql = pg.table(tableNames.HotspotGroups).insert(hotspotGroups).toQuery() + ';';
-    queryLogBuilder.add(upRawSql);
+    queryLogBuilder.addUp(upRawSql);
     return hotspotGroups;
 }
 

@@ -9,20 +9,24 @@ const sanitizeFilename = (name: string) =>
         .replace(/[<>:"/\\|?*\x00-\x1F]/g, '-') // replace characters illegal on Windows/most filesystems
         .replace(/\s+/g, ' ') // collapse multiple spaces
         .trim();
-        
-export const writeLogFilesAndFlush = (type: 'down' | 'up') => {
+
+export const writeLogFilesAndFlush = (type: 'down' | 'up', identifier: string) => {
 
     const prettyDate = date.prettyPrint(new Date(), { showTime: true });
     const safePrettyDate = sanitizeFilename(prettyDate);
 
-
     // UTILITY: ensure the output directory exists
     mkdirSync('sql', { recursive: true });
-    const upFileName = `sql/${Date.now()}-[${safePrettyDate}]-${type}.sql`;
-    const queries = queryLogBuilder.getQuery();
+    const upFileName = `sql/${identifier}-${Date.now()}-[${safePrettyDate}]-${type}.sql`;
+    const queries = type === 'up' ? queryLogBuilder.getUpQuery() : queryLogBuilder.getDownQuery();
     writeFileSync(upFileName, queries);
     console.log(`Wrote migration to ${upFileName}`);
-    queryLogBuilder.clear();
+    if (type === 'up') {
+        queryLogBuilder.clearUpQuery();
+    }
+    if (type === 'down') {
+        queryLogBuilder.clearDownQuery();
+    }
 }
 
 export const getCSVContents = async <T>(filePath: string): Promise<Array<T>> => {

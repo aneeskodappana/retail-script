@@ -145,7 +145,7 @@ export function Marker(v: TMarker, index: number): TMarker {
 export function BuildMarker(data: Array<TMarker>) {
     const marker = data.map(Marker);
     const upRawSql = pg.table(tableNames.Markers).insert(marker).toQuery() + ';';
-    queryLogBuilder.add(upRawSql);
+    queryLogBuilder.addUp(upRawSql);
     return marker;
 }
 

@@ -50,7 +50,7 @@ async function execute() {
         Title: 'Grove Retail Mall',
         Subtitle: 'Grove - Grove Beach Views',
         HasGallery: false,
-        CdnBaseUrl: projectConfig.grove.CdnBaseUrl
+        CdnBaseUrl: projectConfig?.[key]?.CdnBaseUrl
     }];
 
 
@@ -84,12 +84,12 @@ async function execute() {
 
     BuildMarker(markerData);
 
-    writeLogFilesAndFlush('up')
+    writeLogFilesAndFlush('up', 'floor')
 
     // clean up
     const downRawSql = pg.table(tableNames.ViewConfigs).whereIn('Id', [viewConfig.Id]).del().toQuery() + ';';
-    queryLogBuilder.add(downRawSql);
-    writeLogFilesAndFlush('down');
+    queryLogBuilder.addDown(downRawSql);
+    writeLogFilesAndFlush('down', 'floor');
 
 
 

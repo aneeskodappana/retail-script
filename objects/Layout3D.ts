@@ -26,7 +26,7 @@ export function Layout3D(v: TLayout3D, index: number): TLayout3D {
 export function BuildLayout3D(data: Array<TLayout3D>) {
     const layout3d = data.map(Layout3D);
     const upRawSql = pg.table(tableNames.Layout3Ds).insert(layout3d).toQuery() + ';';
-    queryLogBuilder.add(upRawSql);
+    queryLogBuilder.addUp(upRawSql);
     return layout3d;
 }
 
