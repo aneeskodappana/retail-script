@@ -5,5 +5,8 @@ export const pg = knex({ client: "pg" })
 export const tableNames = {
     ViewConfigs: 'ViewConfigs',
     Layout2Ds: 'Layout2Ds',
-    Markers: "Markers"
+    Layout3Ds: 'Layout3Ds',
+    Markers: "Markers",
+    HotspotGroups: "HotspotGroups",
+    Hotspots: "Hotspots"
 }

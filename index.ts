@@ -1,10 +1,10 @@
 import dotenv from 'dotenv'
-import { retailFloor } from "./features/retail-floor";
+import { mallFloor } from "./features/mall-floor";
 dotenv.config();
 
 const main = async () => {
-    // retail floor
-    await retailFloor.execute();
+    // mall floor
+    await mallFloor.execute();
     
 
     

@@ -9,7 +9,7 @@ export type TMarker = {
   Code: string;              // e.g. 'retail-1'
   PositionTop: number;       // e.g. 300.4132080078125
   PositionLeft: number;      // e.g. 343.880126953125
-  NavigateTo: string;        // e.g. '/uae/abudhabi/grove/retail/grove-retail-mall/grove-retail-mall-1'
+  NavigateTo: string;        // e.g. '/uae/abudhabi/grove/mall/grove-retail-mall/grove-retail-mall-1'
   Title: string;             // e.g. '1.1'
   Layout2DId: string;        // parent ref — e.g. 'a74fc1e8-d583-4d48-8b7a-3e015b34fd71'
   Kind: number;             // maybe: 20 for retail??

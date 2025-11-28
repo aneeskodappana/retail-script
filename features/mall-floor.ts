@@ -28,11 +28,11 @@ async function execute() {
     const key = projectName as keyof typeof projectConfig
     const project = projectConfig[key];
     const assets = assetExtractor[key];
-    const floorPlanPath = `assets/${projectName}/${assets.retailFloorPlan}`;
+    const floorPlanPath = `assets/${projectName}/${assets.mallFloorPlan}`;
 
     const floorPlanFiles = await fs.readdir(floorPlanPath, { withFileTypes: true });
     // layout2ds
-    const imageEntries = floorPlanFiles.filter(x => x.isFile() && x.name.endsWith('webp')).map(e => `${assets.retailFloorPlan}/${e.name}`);
+    const imageEntries = floorPlanFiles.filter(x => x.isFile() && x.name.endsWith('webp')).map(e => `${assets.mallFloorPlan}/${e.name}`);
     // markers
     const csvEntry = floorPlanFiles.filter(x => x.isFile() && x.name.endsWith('csv'))?.[0];
     if (!csvEntry) {
@@ -75,15 +75,14 @@ async function execute() {
             Code: code,
             PositionTop: parseFloat(marker.y),
             PositionLeft: parseFloat(marker.x),
-            NavigateTo: `${project.NavigationBaseUrl}retail/${projectName}-retail-mall/${code}`,
+            NavigateTo: `${project.NavigationBaseUrl}mall/${projectName}-retail-mall/${code}`,
             Title: marker.name,
             Layout2DId: layout2d.Id,
             Kind: 20 
         }
     })
 
-    const markers = BuildMarker(markerData);
-    console.log({markers})
+    BuildMarker(markerData);
 
     writeLogFilesAndFlush('up')
 
@@ -97,6 +96,6 @@ async function execute() {
 }
 
 
-export const retailFloor = {
+export const mallFloor = {
     execute
 }

@@ -1,15 +1,15 @@
 # marker update 
 [-] Grove Mall
 
-## Navigation URL for retail mall marker
+## Navigation URL for mall marker
 ```bash
-http://localhost:3000/uae/abudhabi/grove/retail/grove-retail-mall
+http://localhost:3000/uae/abudhabi/grove/mall/grove-mall
 ```
 
-## Floorplan query for retail mall
+## Floorplan query for mall
 
 ```sql
-INSERT INTO public."ViewConfigs" ("Id", "Kind", "Code", "Title", "Subtitle", "NationId", "CityId", "ProjectId", "ClusterId", "AmenityId", "UnitId", "UnitVariantExteriorId", "UnitVariantFloorId", "UnitVariantInteriorId", "HasGallery", "CdnBaseUrl", "ParkingFloorplanId", "ParkingUpgradeGalleryId", "ParkingUpgradeId") VALUES('b51445ef-60ab-4fd2-921f-db88e787fbad'::uuid, 4, 'grove_retail_grove-retail-mall', 'Grove Retail Mall', 'Grove - Grove Beach Views', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, '', NULL, NULL, NULL);
+INSERT INTO public."ViewConfigs" ("Id", "Kind", "Code", "Title", "Subtitle", "NationId", "CityId", "ProjectId", "ClusterId", "AmenityId", "UnitId", "UnitVariantExteriorId", "UnitVariantFloorId", "UnitVariantInteriorId", "HasGallery", "CdnBaseUrl", "ParkingFloorplanId", "ParkingUpgradeGalleryId", "ParkingUpgradeId") VALUES('b51445ef-60ab-4fd2-921f-db88e787fbad'::uuid, 4, 'grove_retail_grove-mall', 'Grove Retail Mall', 'Grove - Grove Beach Views', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, '', NULL, NULL, NULL);
 ```
 
 ## Kind types

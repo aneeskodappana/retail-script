@@ -1,11 +1,11 @@
 type AssetExtrator = {
     grove: {
-        retailFloorPlan?: string
+        mallFloorPlan?: string
     }
 }
 
 export const assetExtractor: AssetExtrator = {
     grove: {
-        retailFloorPlan: 'retail-floorplan'
+        mallFloorPlan: 'mall-floorplan'
     }
 }
