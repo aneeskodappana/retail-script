@@ -43,14 +43,15 @@ async function execute() {
     const markerInputs = await getCSVContents<CSVStructure>(`${floorPlanPath}/${csvEntry.name}`);
 
     // 1. ViewConfig
+    const config = project.floorPlan;
     const viewConfigData: Array<TViewConfig> = [{
         Id: v4(),
         Kind: ViewConfigKind.Floor,
-        Code: 'grove_retail_grove-retail-mall', // <project>_retail_<code> => <code> used for marker navigateTo
-        Title: 'Grove Retail Mall',
-        Subtitle: 'Grove - Grove Beach Views',
+        Code: config.Code,
+        Title: config.Title,
+        Subtitle: config.Subtitle,
         HasGallery: false,
-        CdnBaseUrl: projectConfig?.[key]?.CdnBaseUrl
+        CdnBaseUrl: project.CdnBaseUrl
     }];
 
 
@@ -60,7 +61,7 @@ async function execute() {
     const layout2DData: Array<TLayout2D> = imageEntries.map(x => {
         return ({
             Id: v4(),
-            BackplateUrl: `${project.CdnBaseUrl}${x}`,
+            BackplateUrl: x,
             ViewConfigId: viewConfig.Id
 
         })
@@ -75,7 +76,7 @@ async function execute() {
             Code: code,
             PositionTop: parseFloat(marker.y),
             PositionLeft: parseFloat(marker.x),
-            NavigateTo: `${project.NavigationBaseUrl}mall/${projectName}-retail-mall/${code}`,
+            NavigateTo: `${project.NavigationBaseUrl}mall/${projectName}_retail_mall/${marker.target.replace('.', '_')}`,
             Title: marker.name,
             Layout2DId: layout2d.Id,
             Kind: 20 

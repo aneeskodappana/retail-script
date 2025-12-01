@@ -86,7 +86,7 @@ export function Marker(v: TMarker, index: number): TMarker {
     Kind: v.Kind,
 
     // --- OPTIONAL with repeating defaults (from your INSERTs) ---
-    MarkerIndex: v.MarkerIndex ?? 5,
+    MarkerIndex: v.MarkerIndex ?? index + 1,
 
     IsVisible: v.IsVisible ?? true,
     IsExplorable: v.IsExplorable ?? false,

@@ -11,6 +11,7 @@ import { BuildHotspotGroups, THotspotGroup } from "../objects/HotspotGroup";
 import { BuildHotspots, THotspot } from "../objects/Hotspot";
 import path from "path";
 import { parse } from "csv-parse/sync";
+import { exit } from "process";
 
 async function execute() {
     const projectName = process.env.PROJECT;
@@ -25,7 +26,7 @@ async function execute() {
     const floorPlanFiles = await fs.readdir(floorPlanPath, { withFileTypes: true });
     // layout2ds
     const imageEntries = floorPlanFiles.filter(x => x.isFile() && x.name.endsWith('webp')).map(e => ({
-        fullPath: `${assets.mallFloorPlan}/${e.name}`,
+        fullPath: `${assets.mallInterior}/${e.name}`,
         fileName: e.name
     }));
 
@@ -42,6 +43,10 @@ async function execute() {
         csvContent = csvContent.slice(1);
     }
     const csvRows = parse(csvContent, { columns: true, skip_empty_lines: true, bom: true }) as Array<Record<string, string>>;
+    console.log({csvRows})
+    if(1===1) {
+        process.exit(0)
+    }
 
     // Extract all identifiers and sort them
     const allIdentifiers = csvRows.map(row => row.name?.trim()).filter(Boolean).sort((a, b) => parseFloat(a) - parseFloat(b));
@@ -65,15 +70,15 @@ async function execute() {
 
     imageEntries.forEach(e => {
 
-        // view config first -> grove_grove-retail-mall-3
+        // view config first -> grove_grove_retail_mall_P_1_19_TheGroveMall
         // 1. ViewConfig
-        const viewConfigCode = `${key}_mall_${e.fileName.replace('.', '_').replace('.webp', '')}`; // <project>_retail_<code> => <code> used for marker navigateTo
+        const viewConfigCode = `${project.interior.Code}_${e.fileName.replace('.', '_').replace('.webp', '')}`; // <project>_retail_<code> => <code> used for marker navigateTo
         const viewConfigUUID = v4();
         viewConfigData.push({
             Id: viewConfigUUID,
             Kind: ViewConfigKind.Interior,
             Code: viewConfigCode,
-            Title: projectConfig?.[key]?.mallInteriorTitle,
+            Title: project.interior.Title,
             Subtitle: '',
             HasGallery: false,
             CdnBaseUrl: projectConfig?.[key]?.CdnBaseUrl

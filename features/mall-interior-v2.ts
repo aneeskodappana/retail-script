@@ -27,12 +27,13 @@ async function execute() {
         throw new Error('PROJECT environment variable is not set.');
     }
     const key = projectName as keyof typeof projectConfig;
+    const project = projectConfig[key];
     const assets = assetExtractor[key];
     const floorPlanPath = `assets/${projectName}/${assets.mallInterior}`;
 
     const floorPlanFiles = await fs.readdir(floorPlanPath, { withFileTypes: true });
     const imageEntries = floorPlanFiles.filter(x => x.isFile() && x.name.endsWith('webp')).map(e => ({
-        fullPath: `${assets.mallFloorPlan}/${e.name}`,
+        fullPath: `${assets.mallInterior}/${e.name}`,
         fileName: e.name
     }));
 
@@ -69,7 +70,8 @@ async function execute() {
         const fileName = sourceToFileName.get(source);
         if (!fileName) return;
 
-        const viewConfigCode = `${key}_mall_${fileName.replace('.', '_').replace('.webp', '')}`;
+        // const viewConfigCode = `${key}_mall_${fileName.replace('.', '_').replace('.webp', '')}`;
+        const viewConfigCode = `${project.interior.Code}_${fileName.replace('.', '_').replace('.webp', '')}`; // <project>_retail_<code> => <code> used for marker navigateTo
         const viewConfigUUID = v4();
 
         viewConfigData.push({
