@@ -11,7 +11,11 @@ export const projectConfig = {
         interior: {
             Code: 'grove_grove_retail_mall',
             Title: 'Grove Retail Mall',
+        },
+        hero: {
+            Code: 'grove_hero',
+            Title: 'Grove',
+            Subtitle: '',
         }
-        
     }
 } as const;
