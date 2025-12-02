@@ -29,16 +29,16 @@ async function execute() {
     const key = projectName as keyof typeof projectConfig;
     const project = projectConfig[key];
     const assets = assetExtractor[key];
-    const floorPlanPath = `assets/${projectName}/${assets.mallInterior}`;
+    const interiorPath = `assets/${projectName}/${assets.mallInterior}`;
 
-    const floorPlanFiles = await fs.readdir(floorPlanPath, { withFileTypes: true });
-    const imageEntries = floorPlanFiles.filter(x => x.isFile() && x.name.endsWith('webp')).map(e => ({
+    const interiorFiles = await fs.readdir(interiorPath, { withFileTypes: true });
+    const imageEntries = interiorFiles.filter(x => x.isFile() && x.name.endsWith('webp')).map(e => ({
         fullPath: `${assets.mallInterior}/${e.name}`,
         fileName: e.name
     }));
 
     // Parse coords-suggested-format.csv
-    const csvPath = path.join(floorPlanPath, 'coords-suggested-format.csv');
+    const csvPath = path.join(interiorPath, 'coords-suggested-format.csv');
     let csvContent = await fs.readFile(csvPath, 'utf-8');
     if (csvContent.charCodeAt(0) === 0xFEFF) {
         csvContent = csvContent.slice(1);
@@ -118,7 +118,7 @@ async function execute() {
         if (!sourceFileName || !targetFileName) return;
 
         const mediaUrl = `/${assets.mallInterior}/${sourceFileName}`;
-        const targetViewConfigCode = `${key}_mall_${targetFileName.replace('.', '_').replace('.webp', '')}`;
+        const targetViewConfigCode = `${targetFileName.replace('.', '_').replace('.webp', '')}`;
         const positionJson = `{"X":${row.position_x},"Y":${row.position_y},"Z":${row.position_z}}`;
 
         hotspotData.push({
