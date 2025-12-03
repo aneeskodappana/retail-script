@@ -8,5 +8,6 @@ export const tableNames = {
     Layout3Ds: 'Layout3Ds',
     Markers: "Markers",
     HotspotGroups: "HotspotGroups",
-    Hotspots: "Hotspots"
+    Hotspots: "Hotspots",
+    Navigations: "Navigations"
 }
