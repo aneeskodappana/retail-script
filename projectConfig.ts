@@ -14,8 +14,8 @@ export const projectConfig = {
         },
         hero: {
             Code: 'grove_hero',
-            Title: 'Grove',
-            Subtitle: '',
+            Title: 'Grove Mall',
+            Subtitle: 'Grove',
         }
     }
 } as const;

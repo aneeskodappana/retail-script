@@ -11,79 +11,79 @@ import { BuildHotspotGroups, THotspotGroup } from "../objects/HotspotGroup";
 import { BuildHotspots, THotspot } from "../objects/Hotspot";
 import path from "path";
 import { parse } from "csv-parse/sync";
-import { exit } from "process";
+
+type CsvRow = {
+    source: string;
+    hotspot_index: string;
+    target: string;
+    position_x: string;
+    position_y: string;
+    position_z: string;
+};
 
 async function execute() {
     const projectName = process.env.PROJECT;
     if (!projectName) {
         throw new Error('PROJECT environment variable is not set.');
     }
-    const key = projectName as keyof typeof projectConfig
+    const key = projectName as keyof typeof projectConfig;
     const project = projectConfig[key];
     const assets = assetExtractor[key];
-    const floorPlanPath = `assets/${projectName}/${assets.mallInterior}`;
+    const interiorPath = `assets/${projectName}/${assets.mallInterior}`;
 
-    const floorPlanFiles = await fs.readdir(floorPlanPath, { withFileTypes: true });
-    // layout2ds
-    const imageEntries = floorPlanFiles.filter(x => x.isFile() && x.name.endsWith('webp')).map(e => ({
+    const interiorFiles = await fs.readdir(interiorPath, { withFileTypes: true });
+    const imageEntries = interiorFiles.filter(x => x.isFile() && x.name.endsWith('webp')).map(e => ({
         fullPath: `${assets.mallInterior}/${e.name}`,
         fileName: e.name
     }));
 
-    const viewConfigData: Array<TViewConfig> = [];
-    const layout3DData: Array<TLayout3D> = [];
-    const hotspotGroupData: Array<THotspotGroup> = [];
-    const hotspotData: Array<THotspot> = []
-
-    // Parse coords.csv for hotspot positions
-    const csvPath = path.join(floorPlanPath, 'coords.csv');
+    // Parse coords-suggested-format.csv
+    const csvPath = path.join(interiorPath, 'coords-suggested-format.csv');
     let csvContent = await fs.readFile(csvPath, 'utf-8');
-    // Remove BOM if present
     if (csvContent.charCodeAt(0) === 0xFEFF) {
         csvContent = csvContent.slice(1);
     }
-    const csvRows = parse(csvContent, { columns: true, skip_empty_lines: true, bom: true }) as Array<Record<string, string>>;
-    console.log({csvRows})
-    if(1===1) {
-        process.exit(0)
-    }
+    const csvRows = parse(csvContent, { columns: true, skip_empty_lines: true, bom: true }) as CsvRow[];
 
-    // Extract all identifiers and sort them
-    const allIdentifiers = csvRows.map(row => row.name?.trim()).filter(Boolean).sort((a, b) => parseFloat(a) - parseFloat(b));
+    // Get unique sources from CSV
+    const uniqueSources = [...new Set(csvRows.map(row => row.source.trim()))];
 
-    // Build a map: identifier -> { coordinates for other targets }
-    const coordsMap = new Map<string, string[]>();
-    csvRows.forEach(row => {
-        if (!row.name) return;
-        const coords: string[] = [];
-        for (let i = 1; i <= 4; i++) {
-            const coord = row[`Label Coordinates ${i}`];
-            if (coord && coord.trim()) {
-                coords.push(coord.trim());
-            }
+    // Build filename lookup: source identifier -> filename
+    const sourceToFileName = new Map<string, string>();
+    imageEntries.forEach(e => {
+        const match = e.fileName.match(/P_(\d+\.\d+)_/);
+        if (match) {
+            sourceToFileName.set(match[1], e.fileName);
         }
-        coordsMap.set(row.name.trim(), coords);
     });
 
-    // Map to store hotspotGroupId by viewConfigCode
+    const viewConfigData: Array<TViewConfig> = [];
+    const layout3DData: Array<TLayout3D> = [];
+    const hotspotGroupData: Array<THotspotGroup> = [];
+    const hotspotData: Array<THotspot> = [];
+
+    // Map to store hotspotGroupId by source identifier
     const hotspotGroupIdMap = new Map<string, string>();
 
-    imageEntries.forEach(e => {
+    // Create ViewConfig, Layout3D, HotspotGroup for each unique source
+    uniqueSources.forEach(source => {
+        const fileName = sourceToFileName.get(source);
+        if (!fileName) return;
 
-        // view config first -> grove_grove_retail_mall_P_1_19_TheGroveMall
-        // 1. ViewConfig
-        const viewConfigCode = `${project.interior.Code}_${e.fileName.replace('.', '_').replace('.webp', '')}`; // <project>_retail_<code> => <code> used for marker navigateTo
+        // const viewConfigCode = `${key}_mall_${fileName.replace('.', '_').replace('.webp', '')}`;
+        const viewConfigCode = `${project.interior.Code}_${fileName.replace('.', '_').replace('.webp', '')}`; // <project>_retail_<code> => <code> used for marker navigateTo
         const viewConfigUUID = v4();
+
         viewConfigData.push({
             Id: viewConfigUUID,
             Kind: ViewConfigKind.Interior,
             Code: viewConfigCode,
-            Title: project.interior.Title,
+            Title: projectConfig?.[key]?.mallInteriorTitle,
             Subtitle: '',
             HasGallery: false,
             CdnBaseUrl: projectConfig?.[key]?.CdnBaseUrl
         });
-        // 1:1 viewConfig -> Layout3D 
+
         const layout3DUUid = v4();
         layout3DData.push({
             Id: layout3DUUid,
@@ -91,7 +91,7 @@ async function execute() {
             ModelUrl: '',
             DefaultHotspotGroupIndex: 0,
         });
-        // 1:1  Layout3D -> HotspotGroup
+
         const hotspotGroupId = v4();
         hotspotGroupData.push({
             Id: hotspotGroupId,
@@ -100,58 +100,34 @@ async function execute() {
             DefaultHotspotIndex: 0,
             Layout3DId: layout3DUUid
         });
-        hotspotGroupIdMap.set(viewConfigCode, hotspotGroupId);
 
+        hotspotGroupIdMap.set(source, hotspotGroupId);
     });
 
-    // Generate hotspots for each source image
-    imageEntries.forEach(e => {
-        // Extract identifier from filename: P_1.27_TheGroveMall.webp -> 1.27
-        const match = e.fileName.match(/P_(\d+\.\d+)_/);
-        if (!match) return;
-        const sourceId = match[1];
+    // Generate hotspots directly from CSV rows
+    csvRows.forEach(row => {
+        const source = row.source.trim();
+        const target = row.target.trim();
+        const hotspotIndex = parseInt(row.hotspot_index, 10);
 
-        const viewConfigCode = `${key}_mall_${e.fileName.replace('.', '_').replace('.webp', '')}`;
-        const hotspotGroupId = hotspotGroupIdMap.get(viewConfigCode);
+        const hotspotGroupId = hotspotGroupIdMap.get(source);
         if (!hotspotGroupId) return;
 
-        const mediaUrl = `/${assets.mallInterior}/${e.fileName}`;
-        const coords = coordsMap.get(sourceId) || [];
+        const sourceFileName = sourceToFileName.get(source);
+        const targetFileName = sourceToFileName.get(target);
+        if (!sourceFileName || !targetFileName) return;
 
-        // Get sorted targets (all identifiers except self)
-        const targets = allIdentifiers.filter(id => id !== sourceId);
+        const mediaUrl = `/${assets.mallInterior}/${sourceFileName}`;
+        const targetViewConfigCode = `${targetFileName.replace('.', '_').replace('.webp', '')}`;
+        const positionJson = `{"X":${row.position_x},"Y":${row.position_y},"Z":${row.position_z}}`;
 
-        // HotspotIndex 0: Self/default hotspot
         hotspotData.push({
             Id: v4(),
-            HotspotIndex: 0,
-            Name: viewConfigCode,
+            HotspotIndex: hotspotIndex,
+            Name: targetViewConfigCode,
             MediaUrl: mediaUrl,
             HotspotGroupId: hotspotGroupId,
-            PositionJson: '{"X":0,"Y":0,"Z":0}'
-        });
-
-        // HotspotIndex 1+: Navigation hotspots to other views
-        coords.forEach((coord, idx) => {
-            if (idx >= targets.length) return;
-            const targetId = targets[idx];
-            // Build target viewConfigCode from targetId
-            const targetFileName = imageEntries.find(img => img.fileName.includes(`P_${targetId}_`))?.fileName;
-            if (!targetFileName) return;
-            const targetViewConfigCode = `${key}_mall_${targetFileName.replace('.', '_').replace('.webp', '')}`;
-
-            // Parse coordinate string "X, Y, Z" -> PositionJson
-            const [x, y, z] = coord.split(',').map(s => s.trim());
-            const positionJson = `{"X":${x},"Y":${y},"Z":${z}}`;
-
-            hotspotData.push({
-                Id: v4(),
-                HotspotIndex: idx + 1,
-                Name: targetViewConfigCode,
-                MediaUrl: mediaUrl,
-                HotspotGroupId: hotspotGroupId,
-                PositionJson: positionJson
-            });
+            PositionJson: positionJson
         });
     });
 
@@ -159,20 +135,37 @@ async function execute() {
     BuildLayout3D(layout3DData);
     BuildHotspotGroups(hotspotGroupData);
     BuildHotspots(hotspotData);
-    
-    writeLogFilesAndFlush('up', 'interior');
 
+    writeLogFilesAndFlush('up', 'interior-v2');
 
     // clean up
     const downRawSql = pg.table(tableNames.ViewConfigs).whereIn('Id', viewConfigs.map(x => x.Id)).del().toQuery() + ';';
     queryLogBuilder.addDown(downRawSql);
-    writeLogFilesAndFlush('down', 'interior');
-
-
-
-
+    writeLogFilesAndFlush('down', 'interior-v2');
 }
 
 export const mallInterior = {
     execute
-}
+};
+
+
+/**
+source,hotspot_index,target,position_x,position_y,position_z
+1.11,0,1.11,0,0,0
+1.11,1,1.19,-5946,-1861,160
+1.11,2,1.25,-7946,-3257,160
+1.11,3,1.27,-5956,-5594,160
+1.19,0,1.19,0,0,0
+1.19,1,1.11,210,3702,160
+1.19,2,1.25,-2028,2147,160
+1.19,3,1.27,1162,77,160
+1.25,0,1.25,0,0,0
+1.25,1,1.11,3412,-10870,160
+1.25,2,1.19,2191,-12596,160
+1.25,3,1.27,4188,-13999,160
+1.27,0,1.27,0,0,0
+1.27,1,1.11,1836,-4871,160
+1.27,2,1.19,475,-5740,160
+1.27,3,1.25,2655,-7571,160
+
+ */

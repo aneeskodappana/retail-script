@@ -44,7 +44,7 @@ export type TViewConfig = {
     ParkingUpgradeId?: string;
 };
 
-export type TViewConfigMeta = TViewConfig & {
+export type TViewConfigWithMeta = TViewConfig & {
     _code: string
 }
 

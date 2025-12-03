@@ -1,5 +1,5 @@
 import { v4 } from "uuid";
-import { BuildViewConfig, TViewConfig, TViewConfigMeta, ViewConfigKind } from "../objects/ViewConfig";
+import { BuildViewConfig, TViewConfig, TViewConfigWithMeta, ViewConfigKind } from "../objects/ViewConfig";
 import { projectConfig } from "../projectConfig";
 import { queryLogBuilder } from "../query-log-builder";
 import { pg, tableNames } from "../db";
@@ -36,7 +36,7 @@ async function execute() {
 
     // 1. ViewConfig + Layout2D (one per image)
     const config = project.floorPlan;
-    const viewConfigs: TViewConfigMeta[] = [];
+    const viewConfigs: TViewConfigWithMeta[] = [];
     const layout2Ds: TLayout2D[] = [];
 
     const layoutIdMap: Record<string, string> = {};
