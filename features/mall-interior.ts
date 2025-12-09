@@ -9,17 +9,6 @@ import { queryLogBuilder } from "../query-log-builder";
 import { BuildLayout3D, TLayout3D } from "../objects/Layout3D";
 import { BuildHotspotGroups, THotspotGroup } from "../objects/HotspotGroup";
 import { BuildHotspots, THotspot } from "../objects/Hotspot";
-import path from "path";
-import { parse } from "csv-parse/sync";
-
-type CsvRow = {
-    source: string;
-    hotspot_index: string;
-    target: string;
-    position_x: string;
-    position_y: string;
-    position_z: string;
-};
 
 async function execute() {
     const projectName = process.env.PROJECT;
@@ -37,30 +26,12 @@ async function execute() {
         fileName: e.name
     }));
 
-    // Parse coords-suggested-format.csv
-    const csvPath = path.join(interiorPath, 'coords-suggested-format.csv');
-    let csvContent = await fs.readFile(csvPath, 'utf-8');
-    if (csvContent.charCodeAt(0) === 0xFEFF) {
-        csvContent = csvContent.slice(1);
-    }
-    const csvRows = parse(csvContent, { columns: true, skip_empty_lines: true, bom: true }) as CsvRow[];
-
-    // Get unique sources from CSV
-    const uniqueSources = [...new Set(csvRows.map(row => row.source.trim()))];
-
-    // Build filename lookup: source identifier -> filename
-    const sourceToFileName = new Map<string, string>();
-    imageEntries.forEach(e => {
-        const match = e.fileName.match(/P_(\d+\.\d+)_/);
-        if (match) {
-            sourceToFileName.set(match[1], e.fileName);
-        }
-    });
+    // Process CSV using project-specific logic
+    const { sourceToFileName, uniqueSources, buildHotspotRows } = await project.interior.processInteriorCsv(interiorPath, imageEntries);
 
     const viewConfigData: Array<TViewConfig> = [];
     const layout3DData: Array<TLayout3D> = [];
     const hotspotGroupData: Array<THotspotGroup> = [];
-    const hotspotData: Array<THotspot> = [];
 
     // Map to store hotspotGroupId by source identifier
     const hotspotGroupIdMap = new Map<string, string>();
@@ -71,7 +42,7 @@ async function execute() {
         if (!fileName) return;
 
         // const viewConfigCode = `${key}_mall_${fileName.replace('.', '_').replace('.webp', '')}`;
-        const viewConfigCode = `${project.interior.Code}_${fileName.replace('.', '_').replace('.webp', '')}`; // <project>_retail_<code> => <code> used for marker navigateTo
+        const viewConfigCode = `${project.interior.Code}_${fileName.replace('.', '_').replace('.webp', '').replace('_webp', '')}`; // <project>_retail_<code> => <code> used for marker navigateTo
         const viewConfigUUID = v4();
 
         viewConfigData.push({
@@ -104,39 +75,22 @@ async function execute() {
         hotspotGroupIdMap.set(source, hotspotGroupId);
     });
 
-    // Generate hotspots directly from CSV rows
-    csvRows.forEach(row => {
-        const source = row.source.trim();
-        const target = row.target.trim();
-        const hotspotIndex = parseInt(row.hotspot_index, 10);
-
-        const hotspotGroupId = hotspotGroupIdMap.get(source);
-        if (!hotspotGroupId) return;
-
-        const sourceFileName = sourceToFileName.get(source);
-        const targetFileName = sourceToFileName.get(target);
-        if (!sourceFileName || !targetFileName) return;
-
-        const mediaUrl = `/${assets.mallInterior}/${sourceFileName}`;
-        const targetViewConfigCode = `${targetFileName.replace('.', '_').replace('.webp', '')}`;
-        const positionJson = `{"X":${row.position_x},"Y":${row.position_y},"Z":${row.position_z}}`;
-
-        hotspotData.push({
-            Id: v4(),
-            HotspotIndex: hotspotIndex,
-            Name: targetViewConfigCode,
-            MediaUrl: mediaUrl,
-            HotspotGroupId: hotspotGroupId,
-            PositionJson: positionJson
-        });
-    });
+    const hotspotRows = buildHotspotRows(hotspotGroupIdMap, assets.mallInterior!);
+    const hotspotData: Array<THotspot> = hotspotRows.map(row => ({
+        Id: v4(),
+        HotspotIndex: row.hotspotIndex,
+        Name: row.targetViewConfigCode,
+        MediaUrl: row.mediaUrl,
+        HotspotGroupId: row.hotspotGroupId,
+        PositionJson: row.positionJson
+    }));
 
     const viewConfigs = BuildViewConfig(viewConfigData);
     BuildLayout3D(layout3DData);
     BuildHotspotGroups(hotspotGroupData);
     BuildHotspots(hotspotData);
 
-    writeLogFilesAndFlush('up', 'interior-v2');
+    writeLogFilesAndFlush('up', 'interior');
 
     // clean up
     const downRawSql = pg.table(tableNames.ViewConfigs).whereIn('Id', viewConfigs.map(x => x.Id)).del().toQuery() + ';';

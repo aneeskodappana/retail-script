@@ -51,7 +51,7 @@ export type THotspot = {
     Id: string; // e.g. '0a827077-5699-4047-a7ed-fa28e472577a'
     HotspotIndex: number; // e.g. 1
     Name: string; // e.g. 'adidas'
-    MediaUrl: string; // e.g. '/retail/new/P_1.25_TheGroveMall.webp'
+    MediaUrl?: string; // e.g. '/retail/new/P_1.25_TheGroveMall.webp'
     HotspotGroupId: string; // parent ref — 'db14cf25-a964-46eb-843b-ce7c02e1ccb7'
     PositionJson: string; // default: '{"X":0,"Y":0,"Z":0}'
 
@@ -83,7 +83,7 @@ export function Hotspot(v: THotspot, index: number): THotspot {
         Id: v.Id,
         HotspotIndex: v.HotspotIndex,
         Name: v.Name,
-        MediaUrl: v.MediaUrl,
+        MediaUrl: v.MediaUrl ?? '',
         HotspotGroupId: v.HotspotGroupId,
         PositionJson: v.PositionJson,
 

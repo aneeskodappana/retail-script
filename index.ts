@@ -6,9 +6,9 @@ import { hero } from './features/hero';
 dotenv.config();
 
 const main = async () => {
-    await hero.execute();
+    // await hero.execute();
     await mallFloor.execute();
-    await mallInterior.execute();
+    // await mallInterior.execute();
 }
 
 main();

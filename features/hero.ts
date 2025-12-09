@@ -32,7 +32,7 @@ async function execute() {
     const layout2DData: Array<TLayout2D> = [{
         Id: v4(),
         BackplateUrl: `mall-hero/backplate_image_landing.webp`,
-        ViewConfigId: viewConfig.Id
+        ViewConfigId: viewConfig.Id,
     }];
 
     const [layout2d] = BuildLayout2D(layout2DData);

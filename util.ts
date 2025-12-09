@@ -16,8 +16,8 @@ export const writeLogFilesAndFlush = (type: 'down' | 'up', identifier: string) =
     const safePrettyDate = sanitizeFilename(prettyDate);
 
     // UTILITY: ensure the output directory exists
-    mkdirSync('sql', { recursive: true });
-    const upFileName = `sql/${identifier}-${Date.now()}-[${safePrettyDate}]-${type}.sql`;
+    mkdirSync(`sql/${process.env.PROJECT}`, { recursive: true });
+    const upFileName = `sql/${process.env.PROJECT}/${identifier}-${Date.now()}-[${safePrettyDate}]-${type}.sql`;
     const queries = type === 'up' ? queryLogBuilder.getUpQuery() : queryLogBuilder.getDownQuery();
     writeFileSync(upFileName, queries);
     console.log(`Wrote migration to ${upFileName}`);
