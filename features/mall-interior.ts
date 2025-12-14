@@ -27,7 +27,7 @@ async function execute() {
     }));
 
     // Process CSV using project-specific logic
-    const { sourceToFileName, uniqueSources, buildHotspotRows } = await project.interior.processInteriorCsv(interiorPath, imageEntries);
+    const { sourceToFileName, uniqueSources, buildHotspotRows } = await assets.processInteriorCsv(interiorPath, imageEntries); // @TODO: Check generated positions
 
     const viewConfigData: Array<TViewConfig> = [];
     const layout3DData: Array<TLayout3D> = [];
@@ -37,7 +37,7 @@ async function execute() {
     const hotspotGroupIdMap = new Map<string, string>();
 
     // Create ViewConfig, Layout3D, HotspotGroup for each unique source
-    uniqueSources.forEach(source => {
+    uniqueSources.forEach((source: string) => {
         const fileName = sourceToFileName.get(source);
         if (!fileName) return;
 
@@ -79,10 +79,11 @@ async function execute() {
     const hotspotData: Array<THotspot> = hotspotRows.map(row => ({
         Id: v4(),
         HotspotIndex: row.hotspotIndex,
-        Name: row.targetViewConfigCode,
+        Name: row.targetViewConfigCode.replace(".", '_'),
         MediaUrl: row.mediaUrl,
         HotspotGroupId: row.hotspotGroupId,
-        PositionJson: row.positionJson
+        PositionJson: row.positionJson,
+        OffsetRotationJson: row.offsetRotationJson
     }));
 
     const viewConfigs = BuildViewConfig(viewConfigData);
@@ -95,7 +96,7 @@ async function execute() {
     // clean up
     const downRawSql = pg.table(tableNames.ViewConfigs).whereIn('Id', viewConfigs.map(x => x.Id)).del().toQuery() + ';';
     queryLogBuilder.addDown(downRawSql);
-    writeLogFilesAndFlush('down', 'interior-v2');
+    writeLogFilesAndFlush('down', 'interior');
 }
 
 export const mallInterior = {

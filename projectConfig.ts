@@ -7,6 +7,7 @@ export const projectConfig = {
             Code: 'grove_grove_retail_mall',
             Title: 'Grove Retail Mall',
             Subtitle: 'Grove',
+            navigationUrlSlug: '_retail_mall'
         },
         interior: {
             Code: 'grove_grove_retail_mall',
@@ -23,12 +24,13 @@ export const projectConfig = {
         NavigationBaseUrl: '/uae/abudhabi/yas/',
         mallInteriorTitle: "Yas Mall",
         floorPlan: {
-            Code: 'yas_yas_retail_mall',
+            Code: 'yas_yas_mall',
             Title: 'Yas Mall',
             Subtitle: 'Yas',
+            navigationUrlSlug: '_mall'
         },
         interior: {
-            Code: 'yas_yas_retail_mall',
+            Code: 'yas_yas_mall',
             Title: 'Yas Mall',
         },
         hero: {

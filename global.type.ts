@@ -25,11 +25,12 @@ export type GroveCsvRow = {
 
 export type YasCsvRow = {
     name: string;
-    x: string;
-    y: string;
-    z: string;
-    width: string;
-    height: string;
+    px: string;
+    py: string;
+    pz: string;
+    rx: string;
+    ry: string;
+    rz: string;
     target: string;
 };
 
@@ -44,6 +45,7 @@ export type HotspotRowData = {
     mediaUrl?: string;
     hotspotGroupId: string;
     positionJson: string;
+    offsetRotationJson: string
 };
 
 export type CsvExtractResult = {

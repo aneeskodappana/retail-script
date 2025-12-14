@@ -63,7 +63,9 @@ async function execute() {
         layout2Ds.push({
             Id: layout2dId,
             BackplateUrl: `${assets.mallFloorPlan}/${imageFile}`,
-            ViewConfigId: viewConfigId
+            ViewConfigId: viewConfigId,
+            BackplateHeight: 4096, // @TODO: Move this to config > Floor
+            BackplateWidth: 4006
         });
     }
 
@@ -102,10 +104,12 @@ async function execute() {
                 Code: markerCode,
                 PositionTop: parseFloat(marker.y),
                 PositionLeft: parseFloat(marker.x),
-                NavigateTo: `${project.NavigationBaseUrl}mall/${projectName}_retail_mall/${marker.target.replace('.', '_')}`,
-                Title: marker.name,
+                NavigateTo: `${project.NavigationBaseUrl}mall/${projectName}${project.floorPlan.navigationUrlSlug}/${marker.target.replace('.', '_')}`,
+                Title: '',
                 Layout2DId: layout2dId,
-                Kind: 20 
+                Kind: 11,
+                TitleVisible: false,
+                IconUrl: '/pins/exterior-360.png'
             }
         });
         BuildMarker(markerData);
