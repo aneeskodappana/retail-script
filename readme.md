@@ -36,3 +36,8 @@ enum ViewTypes {
 
 - floorplan image => assets/<project_name>/<image>.webp
 - 
+
+## Yas Mall @TODOs
+
+[] Hero page navigate to url and brand logo (add to project config under hero)
+[] Interior page hotspots & positions
