@@ -33,6 +33,9 @@ async function execute() {
         Id: v4(),
         BackplateUrl: `mall-hero/backplate_image_landing.webp`,
         ViewConfigId: viewConfig.Id,
+        BackplateHeight: 2048,
+        BackplateWidth: 2048,
+        DesktopTransformSettingsJson: '{"Disabled":false,"MinScale":1,"MaxScale":2.5,"Wheel":{"Disabled":false,"WheelDisabled":false,"TouchPadDisabled":false,"Step":0.2,"SmoothStep":0.001},"Pan":{"Disabled":false,"VelocityDisabled":false,"LockAxisX":false,"LockAxisY":false},"Pinch":{"Disabled":false,"Step":5.0},"DoubleClick":{"Disabled":false,"Step":0.7,"Mode":"zoomIn","AnimationTime":200.0,"AnimationType":"easeOut"},"UI":{"HideZoomControls":false}}'
     }];
 
     const [layout2d] = BuildLayout2D(layout2DData);
@@ -44,8 +47,8 @@ async function execute() {
         MarkerIndex: 2001,
         Code: project.hero.Code,
         NavigateTo: project.NavigationBaseUrl,
-        PositionTop: 1000.0,
-        PositionLeft: 1000.0,
+        PositionTop: project.hero.marker.position.top,
+        PositionLeft: project.hero.marker.position.left,
         HoverIconUrl: `${project.CdnBaseUrl}placeholders/project_thumbnail.webp`,
         HoverIconWidth: 400.0,
         HoverIconHeight: 225.0,

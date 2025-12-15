@@ -28,6 +28,7 @@ async function execute() {
 
     // Process CSV using project-specific logic
     const { sourceToFileName, uniqueSources, buildHotspotRows } = await assets.processInteriorCsv(interiorPath, imageEntries); // @TODO: Check generated positions
+    // @TODO: Not all related hotspots are created
 
     const viewConfigData: Array<TViewConfig> = [];
     const layout3DData: Array<TLayout3D> = [];

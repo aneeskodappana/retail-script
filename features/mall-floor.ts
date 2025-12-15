@@ -64,8 +64,8 @@ async function execute() {
             Id: layout2dId,
             BackplateUrl: `${assets.mallFloorPlan}/${imageFile}`,
             ViewConfigId: viewConfigId,
-            BackplateHeight: 4096, // @TODO: Move this to config > Floor
-            BackplateWidth: 4006
+            BackplateHeight: config.BackplateHeight,
+            BackplateWidth: config.BackplateWidth
         });
     }
 
