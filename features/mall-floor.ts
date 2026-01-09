@@ -53,7 +53,7 @@ async function execute() {
             Id: viewConfigId,
             Kind: ViewConfigKind.Floor,
             Code: `${projectName}_${code}`,
-            _code: code,
+            _code: fileName,
             Title: config.Title,
             Subtitle: config.Subtitle,
             HasGallery: false,
@@ -65,7 +65,9 @@ async function execute() {
             BackplateUrl: `${assets.mallFloorPlan}/${imageFile}`,
             ViewConfigId: viewConfigId,
             BackplateHeight: config.BackplateHeight,
-            BackplateWidth: config.BackplateWidth
+            BackplateWidth: config.BackplateWidth,
+            NorthBearing: "0",
+            DesktopTransformSettingsJson: `{"Disabled":false,"MinScale":1.0,"MaxScale":2.5,"Wheel":{"Disabled":false,"WheelDisabled":false,"TouchPadDisabled":false,"Step":0.2,"SmoothStep":0.001},"Pan":{"Disabled":false,"VelocityDisabled":false,"LockAxisX":false,"LockAxisY":false},"Pinch":{"Disabled":false,"Step":5.0},"DoubleClick":{"Disabled":false,"Step":0.7,"Mode":"zoomIn","AnimationTime":200.0,"AnimationType":"easeOut"},"UI":{"HideZoomControls":false}}`
         });
     }
 
@@ -75,20 +77,20 @@ async function execute() {
     BuildLayout2D(layout2Ds);
 
     // 3. Navigations (each ViewConfig gets navigation entries to all ViewConfigs)
-    for (let i = 0; i < viewConfigs.length; i++) {
-        const currentViewConfig = viewConfigs[i];
-        const navigations: TNavigation[] = viewConfigs.map((vc, j) => ({
-            Id: v4(),
-            DisplayName: vc.Title,
-            DisplayOrder: j,
-            IsPriority: i === j,
-            NavigationUrl: `${project.NavigationBaseUrl}mall/${vc._code}`,
-            ViewConfigId: currentViewConfig.Id,
-            CardImageUrl: '',
-            DisplaySubName: ''
-        }));
-        BuildNavigations(navigations);
-    }
+    // for (let i = 0; i < viewConfigs.length; i++) {
+    //     const currentViewConfig = viewConfigs[i];
+    //     const navigations: TNavigation[] = viewConfigs.map((vc, j) => ({
+    //         Id: v4(),
+    //         DisplayName: vc.Title,
+    //         DisplayOrder: j,
+    //         IsPriority: i === j,
+    //         NavigationUrl: `${project.NavigationBaseUrl}mall/${vc._code}`,
+    //         ViewConfigId: currentViewConfig.Id,
+    //         CardImageUrl: '',
+    //         DisplaySubName: ''
+    //     }));
+    //     BuildNavigations(navigations);
+    // }
 
     // 4. Markers
     for (const imageFile of imageEntries) {
@@ -104,14 +106,18 @@ async function execute() {
                 Code: markerCode,
                 PositionTop: parseFloat(marker.y),
                 PositionLeft: parseFloat(marker.x),
-                NavigateTo: `${project.NavigationBaseUrl}mall/${projectName}${project.floorPlan.navigationUrlSlug}/${marker.target.replace('.', '_')}`,
-                Title: '',
+                IconWidth: 72,
+                IconHeight: 72,
+                NavigateTo: `${config.markerNavigateToBase}${marker.target}`,
+                Title: marker.name,
                 Layout2DId: layout2dId,
-                Kind: 11,
-                TitleVisible: false,
+                Kind: 20, // Retail_Floor_Hotspot
+                TitleVisible: true,
                 IconUrl: '/pins/exterior-360.png'
             }
         });
+        // static array of markers @TODO: John provided and ignore IconUrl
+        // keep in project config Array<{}>
         BuildMarker(markerData);
     }
 

@@ -53,6 +53,7 @@ async function execute() {
         HoverIconWidth: 400.0,
         HoverIconHeight: 225.0,
         HoverScale: 125.0,
+        KeepScale: true,
         Title: project.hero.Title,
         TitleVisible: false,
         IconUrl: `${project.CdnBaseUrl}labels/hero-label.svg`,

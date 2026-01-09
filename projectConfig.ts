@@ -9,7 +9,8 @@ export const projectConfig = {
             Subtitle: 'Grove',
             navigationUrlSlug: '_retail_mall',
             BackplateHeight: 4096, 
-            BackplateWidth: 4006
+            BackplateWidth: 4006,
+            markerNavigateToBase: '/uae/abudhabi/grove/mall/grove_retail_mall/' // @TODO: Confirm this
         },
         interior: {
             Code: 'grove_grove_retail_mall',
@@ -36,8 +37,9 @@ export const projectConfig = {
             Title: 'Yas Mall',
             Subtitle: 'Yas',
             navigationUrlSlug: '_mall',
-             BackplateHeight: 4096, 
-            BackplateWidth: 4006
+            BackplateHeight: 4096, 
+            BackplateWidth: 4006,
+            markerNavigateToBase: '/uae/abudhabi/yas/mall/yas_mall/'
         },
         interior: {
             Code: 'yas_yas_mall',
@@ -49,7 +51,7 @@ export const projectConfig = {
             Subtitle: 'Yas',
             marker: {
                 position: {
-                    top: 1000, // based on backplate size
+                    top: 1500, // based on backplate size
                     left: 1000
                 }
             }

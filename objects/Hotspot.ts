@@ -98,7 +98,7 @@ export function Hotspot(v: THotspot, index: number): THotspot {
         OffsetRotationJson: v.OffsetRotationJson ?? '{"X":0,"Y":0,"Z":0,"W":1}',
         DefaultCameraRotationJson: v.DefaultCameraRotationJson ?? '{"X":0,"Y":0,"Z":0,"W":1}',
 
-        CameraSettingsJson: v.CameraSettingsJson ?? '{"default": {"fov": 90}, "version": 1}',
+        // CameraSettingsJson: v.CameraSettingsJson ?? '{"default": {"fov": 90}, "version": 1}',
     };
 }
 
