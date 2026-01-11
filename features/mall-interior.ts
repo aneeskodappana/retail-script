@@ -50,8 +50,8 @@ async function execute() {
             Id: viewConfigUUID,
             Kind: ViewConfigKind.Interior,
             Code: viewConfigCode,
-            Title: projectConfig?.[key]?.mallInteriorTitle,
-            Subtitle: '',
+            Title: fileName.replace('.webp', '').replace('.jpg', ''),
+            Subtitle: projectConfig?.[key]?.mallInteriorTitle,
             HasGallery: false,
             CdnBaseUrl: projectConfig?.[key]?.CdnBaseUrl
         });
