@@ -116,9 +116,21 @@ async function execute() {
                 IconUrl: '/pins/exterior-360.png'
             }
         });
-        // static array of markers @TODO: John provided and ignore IconUrl
-        // keep in project config Array<{}>
-        BuildMarker(markerData);
+        const staticMarkerData: Array<TMarker> = config.staticMarkers.map(sm => ({
+            Id: v4(),
+            Code: slugify(sm.title).replace('.', '_'),
+            PositionTop: sm.y,
+            PositionLeft: sm.x,
+            IconWidth: 72,
+            IconHeight: 72,
+            NavigateTo: '',
+            Title: sm.title,
+            Layout2DId: layout2dId,
+            Kind: 20,
+            TitleVisible: true,
+            IconUrl: ''
+        }));
+        BuildMarker([...markerData, ...staticMarkerData]);
     }
 
     writeLogFilesAndFlush('up', 'floor')

@@ -10,7 +10,8 @@ export const projectConfig = {
             navigationUrlSlug: '_retail_mall',
             BackplateHeight: 4096, 
             BackplateWidth: 4006,
-            markerNavigateToBase: '/uae/abudhabi/grove/mall/grove_retail_mall/' // @TODO: Confirm this
+            markerNavigateToBase: '/uae/abudhabi/grove/mall/grove_retail_mall/', // @TODO: Confirm this
+            staticMarkers: [] as Array<{ title: string; x: number; y: number }>
         },
         interior: {
             Code: 'grove_grove_retail_mall',
@@ -34,12 +35,18 @@ export const projectConfig = {
         mallInteriorTitle: "Yas Mall",
         floorPlan: {
             Code: 'yas_yas_mall',
-            Title: 'Yas Mall',
-            Subtitle: 'Yas',
+            Title: 'Ground Floor',
+            Subtitle: 'Yas Mall',
             navigationUrlSlug: '_mall',
             BackplateHeight: 4096, 
             BackplateWidth: 4006,
-            markerNavigateToBase: '/uae/abudhabi/yas/mall/yas_mall/'
+            markerNavigateToBase: '/uae/abudhabi/yas/mall/yas_mall/',
+            staticMarkers: [
+                { title: 'Cinema Car Park', x: 1071, y: 798 },
+                { title: 'VIP Entrance', x: 2026, y: 431 },
+                { title: 'Hypermarket Car Park', x: 2891, y: 724 },
+                { title: 'Grand Prix Car Park', x: 2939, y: 2772 },
+            ]
         },
         interior: {
             Code: 'yas_yas_mall',
