@@ -9,6 +9,7 @@ import { queryLogBuilder } from "../query-log-builder";
 import { BuildLayout3D, TLayout3D } from "../objects/Layout3D";
 import { BuildHotspotGroups, THotspotGroup } from "../objects/HotspotGroup";
 import { BuildHotspots, THotspot } from "../objects/Hotspot";
+import { BuildNavigations, TNavigation } from "../objects/Navigation";
 
 async function execute() {
     const projectName = process.env.PROJECT;
@@ -86,11 +87,28 @@ async function execute() {
         PositionJson: row.positionJson,
         OffsetRotationJson: row.offsetRotationJson
     }));
+    
 
     const viewConfigs = BuildViewConfig(viewConfigData);
     BuildLayout3D(layout3DData);
     BuildHotspotGroups(hotspotGroupData);
     BuildHotspots(hotspotData);
+
+    // Navigations for each ViewConfig
+    for (let i = 0; i < viewConfigs.length; i++) {
+        const currentViewConfig = viewConfigs[i];
+        const navigations: TNavigation[] = viewConfigs.map((vc, j) => ({
+            Id: v4(),
+            DisplayName: vc.Title,
+            DisplayOrder: j,
+            IsPriority: i === j,
+            NavigationUrl: `${project.NavigationBaseUrl}/${vc.Title}`,
+            ViewConfigId: currentViewConfig.Id,
+            CardImageUrl: '',
+            DisplaySubName: ''
+        }));
+        BuildNavigations(navigations);
+    }
 
     writeLogFilesAndFlush('up', 'interior');
 
