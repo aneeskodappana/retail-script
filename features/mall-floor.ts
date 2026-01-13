@@ -77,20 +77,20 @@ async function execute() {
     BuildLayout2D(layout2Ds);
 
     // 3. Navigations (each ViewConfig gets navigation entries to all ViewConfigs)
-    // for (let i = 0; i < viewConfigs.length; i++) {
-    //     const currentViewConfig = viewConfigs[i];
-    //     const navigations: TNavigation[] = viewConfigs.map((vc, j) => ({
-    //         Id: v4(),
-    //         DisplayName: vc.Title,
-    //         DisplayOrder: j,
-    //         IsPriority: i === j,
-    //         NavigationUrl: `${project.NavigationBaseUrl}mall/${vc._code}`,
-    //         ViewConfigId: currentViewConfig.Id,
-    //         CardImageUrl: '',
-    //         DisplaySubName: ''
-    //     }));
-    //     BuildNavigations(navigations);
-    // }
+    for (let i = 0; i < viewConfigs.length; i++) {
+        const currentViewConfig = viewConfigs[i];
+        const navigations: TNavigation[] = viewConfigs.map((vc, j) => ({
+            Id: v4(),
+            DisplayName: vc.Title,
+            DisplayOrder: j,
+            IsPriority: i === j,
+            NavigationUrl: `${project.NavigationBaseUrl}`,
+            ViewConfigId: currentViewConfig.Id,
+            CardImageUrl: '',
+            DisplaySubName: ''
+        }));
+        BuildNavigations(navigations);
+    }
 
     // 4. Markers
     for (const imageFile of imageEntries) {
