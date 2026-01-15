@@ -19,101 +19,108 @@ async function execute() {
     const key = projectName as keyof typeof projectConfig;
     const project = projectConfig[key];
     const assets = assetExtractor[key];
-    const interiorPath = `assets/${projectName}/${assets.mallInterior}`;
+    const interiorBasePath = `assets/${projectName}/${assets.mallInterior}`;
 
-    const interiorFiles = await fs.readdir(interiorPath, { withFileTypes: true });
-    const imageEntries = interiorFiles.filter(x => x.isFile() && x.name.endsWith('webp')).map(e => ({
-        fullPath: `${assets.mallInterior}/${e.name}`,
-        fileName: e.name
-    }));
+    const interiorDirContents = await fs.readdir(interiorBasePath, { withFileTypes: true });
+    const floorFolders = interiorDirContents.filter(x => x.isDirectory()).map(d => d.name);
 
-    // Process CSV using project-specific logic
-    const { sourceToFileName, uniqueSources, buildHotspotRows } = await assets.processInteriorCsv(interiorPath, imageEntries); // @TODO: Check generated positions
-    // @TODO: Not all related hotspots are created
+    const allViewConfigIds: string[] = [];
 
-    const viewConfigData: Array<TViewConfig> = [];
-    const layout3DData: Array<TLayout3D> = [];
-    const hotspotGroupData: Array<THotspotGroup> = [];
+    for (const floorFolder of floorFolders) {
+        const floorInteriorPath = `${interiorBasePath}/${floorFolder}`;
+        const floorAssetPath = `${assets.mallInterior}/${floorFolder}`;
 
-    // Map to store hotspotGroupId by source identifier
-    const hotspotGroupIdMap = new Map<string, string>();
-
-    // Create ViewConfig, Layout3D, HotspotGroup for each unique source
-    uniqueSources.forEach((source: string) => {
-        const fileName = sourceToFileName.get(source);
-        if (!fileName) return;
-
-        // const viewConfigCode = `${key}_mall_${fileName.replace('.', '_').replace('.webp', '')}`;
-        const viewConfigCode = `${project.interior.Code}_${fileName.replace('.', '_').replace('.webp', '').replace('_webp', '')}`; // <project>_retail_<code> => <code> used for marker navigateTo
-        const viewConfigUUID = v4();
-
-        viewConfigData.push({
-            Id: viewConfigUUID,
-            Kind: ViewConfigKind.Interior,
-            Code: viewConfigCode,
-            Title: fileName.replace('.webp', '').replace('.jpg', ''),
-            Subtitle: projectConfig?.[key]?.mallInteriorTitle,
-            HasGallery: false,
-            CdnBaseUrl: projectConfig?.[key]?.CdnBaseUrl
-        });
-
-        const layout3DUUid = v4();
-        layout3DData.push({
-            Id: layout3DUUid,
-            ViewConfigId: viewConfigUUID,
-            ModelUrl: '',
-            DefaultHotspotGroupIndex: 0,
-        });
-
-        const hotspotGroupId = v4();
-        hotspotGroupData.push({
-            Id: hotspotGroupId,
-            Name: viewConfigCode,
-            HotspotGroupIndex: 0,
-            DefaultHotspotIndex: 0,
-            Layout3DId: layout3DUUid
-        });
-
-        hotspotGroupIdMap.set(source, hotspotGroupId);
-    });
-
-    const hotspotRows = buildHotspotRows(hotspotGroupIdMap, assets.mallInterior!);
-    const hotspotData: Array<THotspot> = hotspotRows.map(row => ({
-        Id: v4(),
-        HotspotIndex: row.hotspotIndex,
-        Name: row.targetViewConfigCode.replace(".", '_'),
-        MediaUrl: row.mediaUrl,
-        HotspotGroupId: row.hotspotGroupId,
-        PositionJson: row.positionJson,
-        OffsetRotationJson: row.offsetRotationJson
-    }));
-    
-
-    const viewConfigs = BuildViewConfig(viewConfigData);
-    BuildLayout3D(layout3DData);
-    BuildHotspotGroups(hotspotGroupData);
-    BuildHotspots(hotspotData);
-
-    // Navigations for each ViewConfig
-    for (let i = 0; i < viewConfigs.length; i++) {
-        const currentViewConfig = viewConfigs[i];
-        const navigations: TNavigation[] = viewConfigs.map((vc, j) => ({
-            Id: v4(),
-            DisplayName: vc.Title,
-            DisplayOrder: j,
-            IsPriority: i === j,
-            NavigationUrl: `${project.NavigationBaseUrl}/${vc.Title}`,
-            ViewConfigId: currentViewConfig.Id,
-            CardImageUrl: '',
-            DisplaySubName: ''
+        const interiorFiles = await fs.readdir(floorInteriorPath, { withFileTypes: true });
+        const imageEntries = interiorFiles.filter(x => x.isFile() && x.name.endsWith('webp')).map(e => ({
+            fullPath: `${floorAssetPath}/${e.name}`,
+            fileName: e.name
         }));
-        BuildNavigations(navigations);
+
+        if (imageEntries.length === 0) continue;
+
+        const { sourceToFileName, uniqueSources, buildHotspotRows } = await assets.processInteriorCsv(floorInteriorPath, imageEntries);
+
+        const viewConfigData: Array<TViewConfig> = [];
+        const layout3DData: Array<TLayout3D> = [];
+        const hotspotGroupData: Array<THotspotGroup> = [];
+        const hotspotGroupIdMap = new Map<string, string>();
+
+        uniqueSources.forEach((source: string) => {
+            const fileName = sourceToFileName.get(source);
+            if (!fileName) return;
+
+            const viewConfigCode = `${project.interior.Code}_${fileName.replace('.', '_').replace('.webp', '').replace('_webp', '')}`;
+            const viewConfigUUID = v4();
+
+            viewConfigData.push({
+                Id: viewConfigUUID,
+                Kind: ViewConfigKind.Interior,
+                Code: viewConfigCode,
+                Title: fileName.replace('.webp', '').replace('.jpg', ''),
+                Subtitle: projectConfig?.[key]?.mallInteriorTitle,
+                HasGallery: false,
+                CdnBaseUrl: projectConfig?.[key]?.CdnBaseUrl
+            });
+
+            const layout3DUUid = v4();
+            layout3DData.push({
+                Id: layout3DUUid,
+                ViewConfigId: viewConfigUUID,
+                ModelUrl: '',
+                DefaultHotspotGroupIndex: 0,
+            });
+
+            const hotspotGroupId = v4();
+            hotspotGroupData.push({
+                Id: hotspotGroupId,
+                Name: viewConfigCode,
+                HotspotGroupIndex: 0,
+                DefaultHotspotIndex: 0,
+                Layout3DId: layout3DUUid
+            });
+
+            hotspotGroupIdMap.set(source, hotspotGroupId);
+        });
+
+        const hotspotRows = buildHotspotRows(hotspotGroupIdMap, floorAssetPath);
+        const hotspotData: Array<THotspot> = hotspotRows.map(row => ({
+            Id: v4(),
+            HotspotIndex: row.hotspotIndex,
+            Name: row.targetViewConfigCode.replace(".", '_'),
+            MediaUrl: row.mediaUrl,
+            HotspotGroupId: row.hotspotGroupId,
+            PositionJson: row.positionJson,
+            OffsetRotationJson: row.offsetRotationJson
+        }));
+
+        const viewConfigs = BuildViewConfig(viewConfigData);
+        BuildLayout3D(layout3DData);
+        BuildHotspotGroups(hotspotGroupData);
+        BuildHotspots(hotspotData);
+
+        allViewConfigIds.push(...viewConfigs.map(vc => vc.Id));
+
+        // Navigations for each ViewConfig within this floor
+        for (let i = 0; i < viewConfigs.length; i++) {
+            const currentViewConfig = viewConfigs[i];
+            const navigations: TNavigation[] = viewConfigs.map((vc, j) => ({
+                Id: v4(),
+                DisplayName: vc.Title,
+                DisplayOrder: j,
+                IsPriority: i === j,
+                NavigationUrl: `${project.interior.NavigationBaseUrl}/${vc.Title}`,
+                ViewConfigId: currentViewConfig.Id,
+                CardImageUrl: '',
+                DisplaySubName: ''
+            }));
+            BuildNavigations(navigations);
+        }
     }
 
     writeLogFilesAndFlush('up', 'interior');
 
     // clean up
-    const downRawSql = pg.table(tableNames.ViewConfigs).whereIn('Id', viewConfigs.map(x => x.Id)).del().toQuery() + ';';
+    const downRawSql = pg.table(tableNames.ViewConfigs).whereIn('Id', allViewConfigIds).del().toQuery() + ';';
     queryLogBuilder.addDown(downRawSql);
     writeLogFilesAndFlush('down', 'interior');
 }

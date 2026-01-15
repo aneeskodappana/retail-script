@@ -53,8 +53,8 @@ async function execute() {
             Id: viewConfigId,
             Kind: ViewConfigKind.Floor,
             Code: `${projectName}_${code}`,
-            _code: fileName,
-            Title: config.Title,
+            _code: code,
+            Title: fileName,
             Subtitle: config.Subtitle,
             HasGallery: false,
             CdnBaseUrl: project.CdnBaseUrl
@@ -84,7 +84,7 @@ async function execute() {
             DisplayName: vc.Title,
             DisplayOrder: j,
             IsPriority: i === j,
-            NavigationUrl: `${project.NavigationBaseUrl}`,
+            NavigationUrl: `${project.floorPlan.markerNavigateToBase}${vc._code}`,
             ViewConfigId: currentViewConfig.Id,
             CardImageUrl: '',
             DisplaySubName: ''

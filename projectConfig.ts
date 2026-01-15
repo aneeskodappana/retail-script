@@ -10,12 +10,13 @@ export const projectConfig = {
             navigationUrlSlug: '_retail_mall',
             BackplateHeight: 4096, 
             BackplateWidth: 4006,
-            markerNavigateToBase: '/uae/abudhabi/grove/mall/grove_retail_mall/', // @TODO: Confirm this
+            markerNavigateToBase: '/uae/abudhabi/grove/mall/', // @TODO: Confirm this
             staticMarkers: [] as Array<{ title: string; x: number; y: number }>
         },
         interior: {
             Code: 'grove_grove_retail_mall',
             Title: 'Grove Retail Mall',
+            NavigationBaseUrl: '/uae/abudhabi/grove/mall/grove_retail_mall/',
         },
         hero: {
             Code: 'grove_hero',
@@ -31,7 +32,7 @@ export const projectConfig = {
     },
     'yas': {
         CdnBaseUrl: '/container_projects/project_1-0-0_uae_abudhabi_yasmall/',
-        NavigationBaseUrl: '/uae/abudhabi/yas/mall/yas_mall',
+        NavigationBaseUrl: '/uae/abudhabi/yas/mall/yas_mall_ground',
         mallInteriorTitle: "Yas Mall",
         floorPlan: {
             Code: 'yas_yas_mall',
@@ -51,6 +52,7 @@ export const projectConfig = {
         interior: {
             Code: 'yas_yas_mall',
             Title: 'Yas Mall',
+            NavigationBaseUrl: '/uae/abudhabi/grove/mall/grove_retail_mall/',
         },
         hero: {
             Code: 'yas_hero',
