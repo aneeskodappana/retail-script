@@ -9,5 +9,6 @@ export const tableNames = {
     Markers: "Markers",
     HotspotGroups: "HotspotGroups",
     Hotspots: "Hotspots",
-    Navigations: "Navigations"
+    Navigations: "Navigations",
+    VideoTransitions: "VideoTransitions"
 }

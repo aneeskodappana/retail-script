@@ -63,6 +63,13 @@ export const projectConfig = {
                     top: 1500, // based on backplate size
                     left: 1000
                 }
+            },
+            videoTransition: {
+                fromLayout2dId: {
+                    dev: '0fd9389e-e5ec-4ceb-9876-909ee7835179',
+                    prod: ''
+                },
+                mediaUrl: 'transition_video/transition_video_yasisland_yasmallhero_day.mp4'
             }
         }
     },
