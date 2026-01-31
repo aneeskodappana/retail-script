@@ -10,5 +10,6 @@ export const tableNames = {
     HotspotGroups: "HotspotGroups",
     Hotspots: "Hotspots",
     Navigations: "Navigations",
-    VideoTransitions: "VideoTransitions"
+    VideoTransitions: "VideoTransitions",
+    Overlays: "Overlays"
 }

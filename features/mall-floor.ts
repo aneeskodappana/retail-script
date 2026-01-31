@@ -10,6 +10,7 @@ import { BuildLayout2D, TLayout2D } from "../objects/Layout2D";
 import { BuildMarker, TMarker } from "../objects/Marker";
 import { BuildNavigations, TNavigation } from "../objects/Navigation";
 import slugify from "slugify";
+import { BuildOverlays, TOverlay } from "../objects/Overlay";
 
 type CSVStructure = {
     name: string,
@@ -75,6 +76,17 @@ async function execute() {
     BuildViewConfig(viewConfigs);
     // 2. Layout2Ds
     BuildLayout2D(layout2Ds);
+
+    // 3. Overlays (one per layout2d, svg file with same name)
+    const overlays: TOverlay[] = imageEntries.map(imageFile => {
+        const fileName = imageFile.replace('.webp', '');
+        return {
+            Id: v4(),
+            Url: `${assets.mallFloorPlan}/${fileName}.svg`,
+            Layout2DId: layoutIdMap[fileName],
+        };
+    });
+    BuildOverlays(overlays);
 
     // 3. Navigations (each ViewConfig gets navigation entries to all ViewConfigs)
     for (let i = 0; i < viewConfigs.length; i++) {
