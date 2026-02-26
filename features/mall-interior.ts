@@ -49,6 +49,8 @@ async function execute() {
             const fileName = sourceToFileName.get(source);
             if (!fileName) return;
 
+            // @TODO: update view config code to not use spaces
+            // also update the marker navigate to no use spaces
             const viewConfigCode = `${project.interior.Code}_${fileName.replace('.', '_').replace('.webp', '').replace('_webp', '')}`;
             const viewConfigUUID = v4();
 
