@@ -10,6 +10,7 @@ import { BuildLayout2D, TLayout2D } from "../objects/Layout2D";
 import { BuildMarker, TMarker } from "../objects/Marker";
 import { BuildNavigations, TNavigation } from "../objects/Navigation";
 import slugify from "slugify";
+import { BuildOverlays, TOverlay } from "../objects/Overlay";
 
 type CSVStructure = {
     name: string,
@@ -54,7 +55,7 @@ async function execute() {
             Kind: ViewConfigKind.Floor,
             Code: `${projectName}_${code}`,
             _code: code,
-            Title: config.Title,
+            Title: fileName,
             Subtitle: config.Subtitle,
             HasGallery: false,
             CdnBaseUrl: project.CdnBaseUrl
@@ -65,7 +66,9 @@ async function execute() {
             BackplateUrl: `${assets.mallFloorPlan}/${imageFile}`,
             ViewConfigId: viewConfigId,
             BackplateHeight: config.BackplateHeight,
-            BackplateWidth: config.BackplateWidth
+            BackplateWidth: config.BackplateWidth,
+            NorthBearing: "0",
+            DesktopTransformSettingsJson: `{"Disabled":false,"MinScale":1.0,"MaxScale":2.5,"Wheel":{"Disabled":false,"WheelDisabled":false,"TouchPadDisabled":false,"Step":0.2,"SmoothStep":0.001},"Pan":{"Disabled":false,"VelocityDisabled":false,"LockAxisX":false,"LockAxisY":false},"Pinch":{"Disabled":false,"Step":5.0},"DoubleClick":{"Disabled":false,"Step":0.7,"Mode":"zoomIn","AnimationTime":200.0,"AnimationType":"easeOut"},"UI":{"HideZoomControls":false}}`
         });
     }
 
@@ -73,6 +76,17 @@ async function execute() {
     BuildViewConfig(viewConfigs);
     // 2. Layout2Ds
     BuildLayout2D(layout2Ds);
+
+    // 3. Overlays (one per layout2d, svg file with same name)
+    const overlays: TOverlay[] = imageEntries.map(imageFile => {
+        const fileName = imageFile.replace('.webp', '');
+        return {
+            Id: v4(),
+            Url: `${assets.mallFloorPlan}/${fileName}.svg`,
+            Layout2DId: layoutIdMap[fileName],
+        };
+    });
+    BuildOverlays(overlays);
 
     // 3. Navigations (each ViewConfig gets navigation entries to all ViewConfigs)
     for (let i = 0; i < viewConfigs.length; i++) {
@@ -82,7 +96,7 @@ async function execute() {
             DisplayName: vc.Title,
             DisplayOrder: j,
             IsPriority: i === j,
-            NavigationUrl: `${project.NavigationBaseUrl}mall/${vc._code}`,
+            NavigationUrl: `${project.floorPlan.markerNavigateToBase}${vc._code}`,
             ViewConfigId: currentViewConfig.Id,
             CardImageUrl: '',
             DisplaySubName: ''
@@ -104,15 +118,31 @@ async function execute() {
                 Code: markerCode,
                 PositionTop: parseFloat(marker.y),
                 PositionLeft: parseFloat(marker.x),
-                NavigateTo: `${project.NavigationBaseUrl}mall/${projectName}${project.floorPlan.navigationUrlSlug}/${marker.target.replace('.', '_')}`,
-                Title: '',
+                IconWidth: 72,
+                IconHeight: 72,
+                NavigateTo: `${config.markerNavigateToBase}${marker.target}`,
+                Title: marker.name,
                 Layout2DId: layout2dId,
-                Kind: 11,
-                TitleVisible: false,
+                Kind: 20, // Retail_Floor_Hotspot
+                TitleVisible: true,
                 IconUrl: '/pins/exterior-360.png'
             }
         });
-        BuildMarker(markerData);
+        const staticMarkerData: Array<TMarker> = config.staticMarkers.map(sm => ({
+            Id: v4(),
+            Code: slugify(sm.title).replace('.', '_'),
+            PositionTop: sm.y,
+            PositionLeft: sm.x,
+            IconWidth: 72,
+            IconHeight: 72,
+            NavigateTo: '',
+            Title: sm.title,
+            Layout2DId: layout2dId,
+            Kind: 20,
+            TitleVisible: true,
+            IconUrl: ''
+        }));
+        BuildMarker([...markerData, ...staticMarkerData]);
     }
 
     writeLogFilesAndFlush('up', 'floor')

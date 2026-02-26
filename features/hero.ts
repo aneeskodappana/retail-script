@@ -6,6 +6,7 @@ import { pg, tableNames } from "../db";
 import { writeLogFilesAndFlush } from "../util";
 import { BuildLayout2D, TLayout2D } from "../objects/Layout2D";
 import { BuildMarker, TMarker } from "../objects/Marker";
+import { BuildVideoTransitions, TVideoTransition } from "../objects/VideoTransition";
 
 async function execute() {
     const projectName = process.env.PROJECT;
@@ -53,6 +54,7 @@ async function execute() {
         HoverIconWidth: 400.0,
         HoverIconHeight: 225.0,
         HoverScale: 125.0,
+        KeepScale: true,
         Title: project.hero.Title,
         TitleVisible: false,
         IconUrl: `${project.CdnBaseUrl}labels/hero-label.svg`,
@@ -69,6 +71,22 @@ async function execute() {
     }];
 
     const [marker] = BuildMarker(markerData);
+
+    // 4. VideoTransition (optional)
+    const env = (process.env.ENV || 'dev') as 'dev' | 'prod';
+    const videoTransition = 'videoTransition' in project.hero ? project.hero.videoTransition : null;
+    if (videoTransition) {
+        const fromLayout2dId = videoTransition.fromLayout2dId[env];
+        if (fromLayout2dId) {
+            const videoTransitionData: Array<TVideoTransition> = [{
+                Id: v4(),
+                FromLayout2dId: fromLayout2dId,
+                ToLayout2dId: layout2d.Id,
+                MediaUrl: `${project.CdnBaseUrl}${videoTransition.mediaUrl}`,
+            }];
+            BuildVideoTransitions(videoTransitionData);
+        }
+    }
 
     writeLogFilesAndFlush('up', 'hero');
 

@@ -1,16 +1,13 @@
+type TAssetExtrator = {
+    mallFloorPlan?: string
+    mallInterior?: string,
+    mallInteriorTitle?: string,
+    processInteriorCsv: (interiorPath: string, imageEntries: ImageEntry[]) => Promise<CsvExtractResult>
+} 
+
 export type AssetExtrator = {
-    grove: {
-        mallFloorPlan?: string
-        mallInterior?: string,
-        mallInteriorTitle?: string,
-        processInteriorCsv: (interiorPath: string, imageEntries: ImageEntry[]) => Promise<CsvExtractResult>
-    },
-    yas: {
-        mallFloorPlan?: string
-        mallInterior?: string,
-        mallInteriorTitle?: string,
-        processInteriorCsv: (interiorPath: string, imageEntries: ImageEntry[]) => Promise<CsvExtractResult>
-    }
+    grove: TAssetExtrator,
+    yas: TAssetExtrator
 }
 
 
