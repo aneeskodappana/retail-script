@@ -148,8 +148,10 @@ async function execute() {
     writeLogFilesAndFlush('up', 'floor')
 
     // clean up
-    const viewConfigIds = viewConfigs.map(vc => vc.Id);
-    const downRawSql = pg.table(tableNames.ViewConfigs).whereIn('Id', viewConfigIds).del().toQuery() + ';';
+    const viewConfigCodes = viewConfigs.map(vc => vc.Code);
+    const selectSql = pg.table(tableNames.ViewConfigs).whereIn('Code', viewConfigCodes).select('*').toQuery() + ';';
+    queryLogBuilder.addDown(`-- Verification: ${selectSql}`);
+    const downRawSql = pg.table(tableNames.ViewConfigs).whereIn('Code', viewConfigCodes).del().toQuery() + ';';
     queryLogBuilder.addDown(downRawSql);
     writeLogFilesAndFlush('down', 'floor');
 

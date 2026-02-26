@@ -24,7 +24,7 @@ async function execute() {
     const interiorDirContents = await fs.readdir(interiorBasePath, { withFileTypes: true });
     const floorFolders = interiorDirContents.filter(x => x.isDirectory()).map(d => d.name);
 
-    const allViewConfigIds: string[] = [];
+    const allViewConfigCodes: string[] = [];
 
     for (const floorFolder of floorFolders) {
         const floorInteriorPath = `${interiorBasePath}/${floorFolder}`;
@@ -100,7 +100,7 @@ async function execute() {
         BuildHotspotGroups(hotspotGroupData);
         BuildHotspots(hotspotData);
 
-        allViewConfigIds.push(...viewConfigs.map(vc => vc.Id));
+        allViewConfigCodes.push(...viewConfigs.map(vc => vc.Code));
 
         // Navigations for each ViewConfig within this floor
         for (let i = 0; i < viewConfigs.length; i++) {
@@ -122,7 +122,9 @@ async function execute() {
     writeLogFilesAndFlush('up', 'interior');
 
     // clean up
-    const downRawSql = pg.table(tableNames.ViewConfigs).whereIn('Id', allViewConfigIds).del().toQuery() + ';';
+    const selectSql = pg.table(tableNames.ViewConfigs).whereIn('Code', allViewConfigCodes).select('*').toQuery() + ';';
+    queryLogBuilder.addDown(`-- Verification: ${selectSql}`);
+    const downRawSql = pg.table(tableNames.ViewConfigs).whereIn('Code', allViewConfigCodes).del().toQuery() + ';';
     queryLogBuilder.addDown(downRawSql);
     writeLogFilesAndFlush('down', 'interior');
 }

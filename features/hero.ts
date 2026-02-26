@@ -77,21 +77,24 @@ async function execute() {
     const videoTransition = 'videoTransition' in project.hero ? project.hero.videoTransition : null;
     if (videoTransition) {
         const fromLayout2dId = videoTransition.fromLayout2dId[env];
-        if (fromLayout2dId) {
-            const videoTransitionData: Array<TVideoTransition> = [{
-                Id: v4(),
-                FromLayout2dId: fromLayout2dId,
-                ToLayout2dId: layout2d.Id,
-                MediaUrl: `${project.CdnBaseUrl}${videoTransition.mediaUrl}`,
-            }];
-            BuildVideoTransitions(videoTransitionData);
+        if (!fromLayout2dId) {
+            throw new Error(`fromLayout2dId not configured for project ${projectName} in ${env} environment`);
         }
+        const videoTransitionData: Array<TVideoTransition> = [{
+            Id: v4(),
+            FromLayout2dId: fromLayout2dId,
+            ToLayout2dId: layout2d.Id,
+            MediaUrl: `${project.CdnBaseUrl}${videoTransition.mediaUrl}`,
+        }];
+        BuildVideoTransitions(videoTransitionData);
     }
 
     writeLogFilesAndFlush('up', 'hero');
 
     // clean up
-    const downRawSql = pg.table(tableNames.ViewConfigs).whereIn('Id', [viewConfig.Id]).del().toQuery() + ';';
+    const selectSql = pg.table(tableNames.ViewConfigs).whereIn('Code', [viewConfig.Code]).select('*').toQuery() + ';';
+    queryLogBuilder.addDown(`-- Verification: ${selectSql}`);
+    const downRawSql = pg.table(tableNames.ViewConfigs).whereIn('Code', [viewConfig.Code]).del().toQuery() + ';';
     queryLogBuilder.addDown(downRawSql);
     writeLogFilesAndFlush('down', 'hero');
 }

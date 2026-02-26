@@ -13,11 +13,11 @@ const sanitizeFilename = (name: string) =>
 export const writeLogFilesAndFlush = (type: 'down' | 'up', identifier: string) => {
 
     const prettyDate = date.prettyPrint(new Date(), { showTime: true });
-    const safePrettyDate = sanitizeFilename(prettyDate);
+    const safePrettyDate = sanitizeFilename(prettyDate).replace(/\s/g, '_').replace(',', '');
 
     // UTILITY: ensure the output directory exists
     mkdirSync(`sql/${process.env.PROJECT}`, { recursive: true });
-    const upFileName = `sql/${process.env.PROJECT}/${identifier}-${Date.now()}-[${safePrettyDate}]-${type}.sql`;
+    const upFileName = `sql/${process.env.PROJECT}/${identifier}_${Date.now()}_${safePrettyDate}_${type}.sql`;
     const queries = type === 'up' ? queryLogBuilder.getUpQuery() : queryLogBuilder.getDownQuery();
     writeFileSync(upFileName, queries);
     console.log(`Wrote migration to ${upFileName}`);
