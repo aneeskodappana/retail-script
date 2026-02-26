@@ -120,7 +120,7 @@ async function execute() {
                 PositionLeft: parseFloat(marker.x),
                 IconWidth: 72,
                 IconHeight: 72,
-                NavigateTo: `${config.markerNavigateToBase}${marker.target}`,
+                NavigateTo: `${config.markerNavigateToBase}${marker.target.replace(' ', '-')}`, // no space allowed in the url (Veracode scan/latest nextjs version)
                 Title: marker.name,
                 Layout2DId: layout2dId,
                 Kind: 20, // Retail_Floor_Hotspot

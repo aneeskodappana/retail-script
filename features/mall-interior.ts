@@ -57,7 +57,7 @@ async function execute() {
             viewConfigData.push({
                 Id: viewConfigUUID,
                 Kind: ViewConfigKind.Interior,
-                Code: viewConfigCode,
+                Code: viewConfigCode.replace(/ /g, '-'),
                 Title: fileName.replace('.webp', '').replace('.jpg', ''),
                 Subtitle: projectConfig?.[key]?.mallInteriorTitle,
                 HasGallery: false,
@@ -75,7 +75,7 @@ async function execute() {
             const hotspotGroupId = v4();
             hotspotGroupData.push({
                 Id: hotspotGroupId,
-                Name: viewConfigCode,
+                Name: viewConfigCode.replace(/ /g, '-'),
                 HotspotGroupIndex: 0,
                 DefaultHotspotIndex: 0,
                 Layout3DId: layout3DUUid
@@ -88,7 +88,7 @@ async function execute() {
         const hotspotData: Array<THotspot> = hotspotRows.map(row => ({
             Id: v4(),
             HotspotIndex: row.hotspotIndex,
-            Name: row.targetViewConfigCode.replace(".", '_'),
+            Name: row.targetViewConfigCode.replace(".", '_').replace(/ /g, '-'),
             MediaUrl: row.mediaUrl,
             HotspotGroupId: row.hotspotGroupId,
             PositionJson: row.positionJson,
