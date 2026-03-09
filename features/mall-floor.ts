@@ -67,6 +67,7 @@ async function execute() {
             ViewConfigId: viewConfigId,
             BackplateHeight: config.BackplateHeight,
             BackplateWidth: config.BackplateWidth,
+            BackplateVersion: config.BackplateVersion,
             NorthBearing: "0",
             DesktopTransformSettingsJson: `{"Disabled":false,"MinScale":1.0,"MaxScale":2.5,"Wheel":{"Disabled":false,"WheelDisabled":false,"TouchPadDisabled":false,"Step":0.2,"SmoothStep":0.001},"Pan":{"Disabled":false,"VelocityDisabled":false,"LockAxisX":false,"LockAxisY":false},"Pinch":{"Disabled":false,"Step":5.0},"DoubleClick":{"Disabled":false,"Step":0.7,"Mode":"zoomIn","AnimationTime":200.0,"AnimationType":"easeOut"},"UI":{"HideZoomControls":false}}`
         });
@@ -118,13 +119,14 @@ async function execute() {
                 Code: markerCode,
                 PositionTop: parseFloat(marker.y),
                 PositionLeft: parseFloat(marker.x),
-                IconWidth: 72,
-                IconHeight: 72,
-                NavigateTo: `${config.markerNavigateToBase}${marker.target.replace(' ', '-')}`, // no space allowed in the url (Veracode scan/latest nextjs version)
+                IconWidth: 32,
+                IconHeight: 32,
+                NavigateTo: `${config.markerNavigateToBase}${fileName.replace(/ /g, '-')}/${marker.target.replace(/ /g, '-')}`, // no space allowed in the url (Veracode scan/latest nextjs version)
                 Title: marker.name,
                 Layout2DId: layout2dId,
                 Kind: 20, // Retail_Floor_Hotspot
                 TitleVisible: true,
+                KeepScale: true,
                 IconUrl: '/pins/exterior-360.png'
             }
         });

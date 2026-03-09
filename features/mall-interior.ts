@@ -51,7 +51,7 @@ async function execute() {
 
             // @TODO: update view config code to not use spaces
             // also update the marker navigate to no use spaces
-            const viewConfigCode = `${project.interior.Code}_${fileName.replace('.', '_').replace('.webp', '').replace('_webp', '')}`;
+            const viewConfigCode = `${project.interior.Code}_${floorFolder.replace(/ /g, '-')}_${fileName.replace('.', '_').replace('.webp', '').replace('_webp', '')}`;
             const viewConfigUUID = v4();
 
             viewConfigData.push({
@@ -110,7 +110,7 @@ async function execute() {
                 DisplayName: vc.Title,
                 DisplayOrder: j,
                 IsPriority: i === j,
-                NavigationUrl: `${project.interior.NavigationBaseUrl}/${vc.Title}`,
+                NavigationUrl: `${project.interior.NavigationBaseUrl}${floorFolder.replace(/ /g, '-')}/${vc.Title.replace(/ /g, '-')}`,
                 ViewConfigId: currentViewConfig.Id,
                 CardImageUrl: '',
                 DisplaySubName: ''

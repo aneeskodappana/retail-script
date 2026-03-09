@@ -8,15 +8,16 @@ export const projectConfig = {
             Title: 'Grove Retail Mall',
             Subtitle: 'Grove',
             navigationUrlSlug: '_retail_mall',
-            BackplateHeight: 4096, 
-            BackplateWidth: 4006,
+            BackplateHeight: 2048.0, 
+            BackplateWidth: 2048.0,
+            BackplateVersion: 3,
             markerNavigateToBase: '/uae/abudhabi/grove/mall/', // @TODO: Confirm this
             staticMarkers: [] as Array<{ title: string; x: number; y: number }>
         },
         interior: {
-            Code: 'grove_grove_retail_mall',
+            Code: 'grove',
             Title: 'Grove Retail Mall',
-            NavigationBaseUrl: '/uae/abudhabi/grove/mall/grove_retail_mall/',
+            NavigationBaseUrl: '/uae/abudhabi/grove/mall/',
         },
         hero: {
             Code: 'grove_hero',
@@ -41,6 +42,7 @@ export const projectConfig = {
             navigationUrlSlug: '_mall',
             BackplateHeight: 4096, 
             BackplateWidth: 4006,
+            BackplateVersion: 1,
             markerNavigateToBase: '/uae/abudhabi/yas/mall/yas_mall/',
             staticMarkers: [
                 { title: 'Cinema Car Park', x: 1071, y: 798 },
@@ -52,7 +54,7 @@ export const projectConfig = {
         interior: {
             Code: 'yas_yas_mall',
             Title: 'Yas Mall',
-            NavigationBaseUrl: '/uae/abudhabi/grove/mall/grove_retail_mall/',
+            NavigationBaseUrl: '/uae/abudhabi/grove/mall/',
         },
         hero: {
             Code: 'yas_hero',
