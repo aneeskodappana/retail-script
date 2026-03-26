@@ -33,7 +33,14 @@ async function execute() {
     const floorPlanPath = `assets/${projectName}/${assets.mallFloorPlan}`;
 
     const floorPlanFiles = await fs.readdir(floorPlanPath, { withFileTypes: true });
-    const imageEntries = floorPlanFiles.filter(x => x.isFile() && x.name.endsWith('webp')).map(e => e.name);
+    const imageEntries = floorPlanFiles.filter(x => x.isFile() && x.name.endsWith('webp')).map(e => e.name)
+        .sort((a, b) => {
+            const aIsGround = a.toLowerCase().startsWith('ground');
+            const bIsGround = b.toLowerCase().startsWith('ground');
+            if (aIsGround && !bIsGround) return -1;
+            if (!aIsGround && bIsGround) return 1;
+            return a.localeCompare(b, undefined, { numeric: true });
+        });
 
     // 1. ViewConfig + Layout2D (one per image)
     const config = project.floorPlan;
@@ -45,7 +52,7 @@ async function execute() {
     for (const imageFile of imageEntries) {
         const fileName = imageFile.replace('.webp', '');
         const code = `${slugify(fileName).replace(/\./g, '_')}`;
-        
+
         const viewConfigId = v4();
         const layout2dId = v4();
         layoutIdMap[fileName] = layout2dId;
@@ -78,16 +85,21 @@ async function execute() {
     // 2. Layout2Ds
     BuildLayout2D(layout2Ds);
 
-    // 3. Overlays (one per layout2d, svg file with same name)
-    const overlays: TOverlay[] = imageEntries.map(imageFile => {
+    // 3. Overlays (one per layout2d, svg file with same name — only if svg exists)
+    const overlays: TOverlay[] = [];
+    for (const imageFile of imageEntries) {
         const fileName = imageFile.replace('.webp', '');
-        return {
-            Id: v4(),
-            Url: `${assets.mallFloorPlan}/${fileName}.svg`,
-            Layout2DId: layoutIdMap[fileName],
-        };
-    });
-    BuildOverlays(overlays);
+        const svgPath = `${floorPlanPath}/${fileName}.svg`;
+        const svgExists = await fs.access(svgPath).then(() => true).catch(() => false);
+        if (svgExists) {
+            overlays.push({
+                Id: v4(),
+                Url: `${assets.mallFloorPlan}/${fileName}.svg`,
+                Layout2DId: layoutIdMap[fileName],
+            });
+        }
+    }
+    if (overlays.length > 0) BuildOverlays(overlays);
 
     // 3. Navigations (each ViewConfig gets navigation entries to all ViewConfigs)
     for (let i = 0; i < viewConfigs.length; i++) {
@@ -111,28 +123,34 @@ async function execute() {
         const csvPath = `${floorPlanPath}/${fileName}.csv`;
         const layout2dId = layoutIdMap[fileName];
 
-        const markerInputs = await getCSVContents<CSVStructure>(csvPath);
-        const markerData: Array<TMarker> = markerInputs.map(marker => {
-            const markerCode = slugify(marker.name).replace('.', '_');
-            return {
-                Id: v4(),
-                Code: markerCode,
-                PositionTop: parseFloat(marker.y),
-                PositionLeft: parseFloat(marker.x),
-                IconWidth: 32,
-                IconHeight: 32,
-                NavigateTo: `${config.markerNavigateToBase}${fileName.replace(/ /g, '-')}/${marker.target.replace(/ /g, '-')}`, // no space allowed in the url (Veracode scan/latest nextjs version)
-                Title: marker.name,
-                Layout2DId: layout2dId,
-                Kind: 20, // Retail_Floor_Hotspot
-                TitleVisible: true,
-                KeepScale: true,
-                IconUrl: '/pins/exterior-360.png'
-            }
-        });
-        const staticMarkerData: Array<TMarker> = config.staticMarkers.map(sm => ({
+        const csvExists = await fs.access(csvPath).then(() => true).catch(() => false);
+
+        let markerData: Array<TMarker> = [];
+        if (csvExists) {
+            const markerInputs = await getCSVContents<CSVStructure>(csvPath);
+            markerData = markerInputs.map(marker => {
+                const markerCode = slugify(marker.name).replace('.', '_');
+                return {
+                    Id: v4(),
+                    Code: markerCode,
+                    PositionTop: parseFloat(marker.y),
+                    PositionLeft: parseFloat(marker.x),
+                    IconWidth: 32,
+                    IconHeight: 32,
+                    NavigateTo: `${config.markerNavigateToBase}${fileName.replace(/ /g, '-')}/${marker.target.replace(/ /g, '-')}`, // no space allowed in the url (Veracode scan/latest nextjs version)
+                    Title: marker.name,
+                    Layout2DId: layout2dId,
+                    Kind: 20, // Retail_Floor_Hotspot
+                    TitleVisible: true,
+                    KeepScale: true,
+                    IconUrl: '/pins/exterior-360.png'
+                }
+            });
+        }
+        const staticMarkersForFile = (config.staticMarkers as Record<string, Array<{ title: string, x: number, y: number }>>)[fileName] || [];
+        const staticMarkerData: Array<TMarker> = staticMarkersForFile.map((sm: any) => ({
             Id: v4(),
-            Code: slugify(sm.title).replace('.', '_'),
+            Code: 'static:' + slugify(sm.title).replace('.', '_'),
             PositionTop: sm.y,
             PositionLeft: sm.x,
             IconWidth: 72,
@@ -141,6 +159,7 @@ async function execute() {
             Title: sm.title,
             Layout2DId: layout2dId,
             Kind: 20,
+            KeepScale: true,
             TitleVisible: true,
             IconUrl: ''
         }));
